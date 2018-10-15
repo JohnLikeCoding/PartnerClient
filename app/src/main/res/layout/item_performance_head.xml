@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginBottom="@dimen/space_35"
+              android:layout_marginLeft="@dimen/space_15"
+              android:layout_marginRight="@dimen/space_15"
+              android:layout_marginTop="@dimen/space_20"
+              android:background="@drawable/conner_green_bg"
+              android:orientation="vertical"
+              android:paddingBottom="@dimen/space_20"
+              android:paddingTop="@dimen/space_20">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/performance_count_tip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="绩效总额"
+            android:textColor="@color/color_white"
+            android:textSize="@dimen/font_18"/>
+
+        <TextView
+            android:id="@+id/agreement_performance_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/performance_count_tip"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/space_20"
+            android:text="绩效奖励规则"
+            android:textColor="@color/color_white"
+            android:textSize="@dimen/font_13"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/space_15"
+        android:layout_marginTop="@dimen/space_15"
+        android:gravity="center_horizontal|bottom"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="¥ "
+            android:textColor="@color/color_white"
+            android:textSize="@dimen/font_14"/>
+
+        <TextView
+            android:id="@+id/performance_count_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0.00"
+            android:textColor="@color/color_white"
+            android:textSize="@dimen/font_26"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/order_count_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="0次\n接单次数"
+            android:textColor="@color/color_white"
+            android:textSize="@dimen/font_13"/>
+
+        <TextView
+            android:id="@+id/order_failure_count_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="0次\n未完成次数"
+            android:textColor="@color/color_white"
+            android:textSize="@dimen/font_13"/>
+
+        <TextView
+            android:id="@+id/withhold_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="- 0.00\n未完成扣款"
+            android:textColor="@color/color_white"
+            android:textSize="@dimen/font_13"/>
+
+    </LinearLayout>
+
+
+</LinearLayout>

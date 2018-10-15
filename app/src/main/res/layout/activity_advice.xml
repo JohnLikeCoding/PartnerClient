@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:background="@color/color_white"
+              android:orientation="vertical">
+
+    <include layout="@layout/layout_top_bar"/>
+
+    <EditText
+        android:id="@+id/advice_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/space_10"
+        android:layout_marginRight="@dimen/space_10"
+        android:background="@null"
+        android:gravity="top"
+        android:hint="请将您的意见在此填写，感谢您的支持！"
+        android:minHeight="@dimen/space_140"
+        android:paddingBottom="@dimen/space_15"
+        android:paddingLeft="@dimen/space_10"
+        android:paddingRight="@dimen/space_10"
+        android:paddingTop="@dimen/space_20"
+        android:textColor="@color/color_333333"
+        android:textColorHint="@color/color_e6e6e6"
+        android:textSize="@dimen/font_14"/>
+
+    <TextView
+        android:id="@+id/remain_tip_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/space_15"
+        android:gravity="right"
+        tools:text="还差10个字可以发布"
+        android:textColor="@color/color_808080"
+        android:textSize="@dimen/font_12"/>
+
+    <View
+        style="@style/horizontal_line"
+        android:layout_marginLeft="@dimen/space_10"
+        android:layout_marginTop="@dimen/space_15"/>
+
+    <Button
+        android:id="@+id/post_btn"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/space_50"
+        android:layout_marginLeft="@dimen/space_10"
+        android:layout_marginRight="@dimen/space_10"
+        android:layout_marginTop="@dimen/space_50"
+        android:background="@drawable/conner_green_bg"
+        android:text="投诉"
+        android:textColor="@color/color_white"
+        android:textSize="@dimen/font_16"/>
+
+
+</LinearLayout>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group>
+        <item
+            android:id="@+id/nav_performance"
+            android:icon="@drawable/jx"
+            android:title="@string/my_performance"/>
+        <item
+            android:id="@+id/nav_advice"
+            android:icon="@drawable/yj"
+            android:title="@string/advice"/>
+        <item
+            android:id="@+id/nav_call"
+            android:icon="@drawable/kf"
+            android:title="@string/call_center"/>
+        <item
+            android:id="@+id/nav_setting"
+            android:icon="@drawable/sz"
+            android:title="@string/setting"/>
+    </group>
+
+</menu>

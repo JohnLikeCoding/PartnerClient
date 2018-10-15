@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.kuaigui.yueche.driver.main.MainActivity"
+    tools:showIn="@layout/app_bar_main">
+
+    <LinearLayout
+        android:id="@+id/online_tip_ll"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/space_40"
+        android:background="@color/color_ffdfd9"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/space_40"
+            android:drawableLeft="@drawable/jg"
+            android:drawablePadding="@dimen/space_10"
+            android:gravity="center"
+            android:text="您还未上班，请点击上班"
+            android:textColor="@color/color_333333"
+            android:textSize="@dimen/font_14"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/basic_info_ll"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/space_40"
+        android:layout_below="@+id/online_tip_ll"
+        android:background="@color/color_white"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/local"/>
+
+            <TextView
+                android:id="@+id/local_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/space_10"
+                android:text="当前位置："
+                android:textColor="@color/color_808080"
+                android:textSize="@dimen/font_13"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/time1"/>
+
+            <TextView
+                android:id="@+id/current_time_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/space_10"
+                android:textColor="@color/color_808080"
+                android:textSize="@dimen/font_13"
+                tools:text="2018-10-11"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/space_160"
+        android:layout_below="@+id/basic_info_ll"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/map"
+        android:background="@color/color_white"
+        android:orientation="horizontal"
+        android:paddingBottom="@dimen/space_20"
+        android:paddingTop="@dimen/space_20">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="本月产值"
+                android:textColor="@color/color_808080"
+                android:textSize="@dimen/font_14"/>
+
+            <TextView
+                android:id="@+id/month_performance_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_5"
+                android:text="¥0.00"
+                android:textColor="@color/color_1bb671"
+                android:textSize="@dimen/font_22"/>
+
+        </LinearLayout>
+
+        <View style="@style/vertical_line"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="总产值"
+                android:textColor="@color/color_808080"
+                android:textSize="@dimen/font_14"/>
+
+            <TextView
+                android:id="@+id/total_performance_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_5"
+                android:text="¥0.00"
+                android:textColor="@color/color_1bb671"
+                android:textSize="@dimen/font_22"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/space_50"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="@dimen/space_20"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/space_15"
+        android:paddingRight="@dimen/space_15">
+
+        <Button
+            android:id="@+id/online_btn"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/conner_green_bg"
+            android:text="上班"
+            android:textColor="@color/color_white"
+            android:textSize="@dimen/font_16"/>
+
+        <Button
+            android:id="@+id/order_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/space_10"
+            android:background="@drawable/conner_gray_bg"
+            android:paddingLeft="@dimen/space_25"
+            android:paddingRight="@dimen/space_25"
+            android:text="听单"
+            android:textColor="@color/color_white"
+            android:textSize="@dimen/font_16"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

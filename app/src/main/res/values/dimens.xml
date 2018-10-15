@@ -1,0 +1,58 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="nav_header_vertical_spacing">16dp</dimen>
+    <dimen name="nav_header_height">160dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="font_12">12sp</dimen>
+    <dimen name="font_13">13sp</dimen>
+    <dimen name="font_14">14sp</dimen>
+    <dimen name="font_16">16sp</dimen>
+    <dimen name="font_18">18sp</dimen>
+    <dimen name="font_20">20sp</dimen>
+    <dimen name="font_22">22sp</dimen>
+    <dimen name="font_24">24sp</dimen>
+    <dimen name="font_26">26sp</dimen>
+    <dimen name="font_32">32sp</dimen>
+    <dimen name="font_42">42sp</dimen>
+
+    <dimen name="space_1">2px</dimen>
+    <dimen name="space_2">4px</dimen>
+    <dimen name="space_5">10px</dimen>
+    <dimen name="space_8">16px</dimen>
+    <dimen name="space_10">20px</dimen>
+    <dimen name="space_12">24px</dimen>
+    <dimen name="space_15">30px</dimen>
+    <dimen name="space_17">34px</dimen>
+    <dimen name="space_20">40px</dimen>
+    <dimen name="space_25">50px</dimen>
+    <dimen name="space_30">60px</dimen>
+    <dimen name="space_35">70px</dimen>
+    <dimen name="space_40">80px</dimen>
+    <dimen name="space_45">90px</dimen>
+    <dimen name="space_50">100px</dimen>
+    <dimen name="space_52">104px</dimen>
+    <dimen name="space_55">110px</dimen>
+    <dimen name="space_60">120px</dimen>
+    <dimen name="space_65">130px</dimen>
+    <dimen name="space_70">140px</dimen>
+    <dimen name="space_75">150px</dimen>
+    <dimen name="space_80">160px</dimen>
+    <dimen name="space_85">170px</dimen>
+    <dimen name="space_90">180px</dimen>
+    <dimen name="space_100">200px</dimen>
+    <dimen name="space_110">220px</dimen>
+    <dimen name="space_125">250px</dimen>
+    <dimen name="space_140">280px</dimen>
+    <dimen name="space_160">320px</dimen>
+    <dimen name="space_210">420px</dimen>
+    <dimen name="big_item_height">150px</dimen>
+    <dimen name="car_item_height">180px</dimen>
+    <dimen name="huge_item_height">210px</dimen>
+    <dimen name="normal_item_height">110px</dimen>
+    <dimen name="btn_item_height">100px</dimen>
+    <dimen name="small_item_height">80px</dimen>
+
+</resources>
