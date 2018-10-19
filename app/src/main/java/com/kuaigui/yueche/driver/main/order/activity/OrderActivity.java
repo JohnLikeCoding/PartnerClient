@@ -1,5 +1,6 @@
 package com.kuaigui.yueche.driver.main.order.activity;
 
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -10,9 +11,12 @@ import android.widget.TextView;
 import com.kuaigui.yueche.driver.R;
 import com.kuaigui.yueche.driver.base.adapter.BaseFragmentPagerAdapter;
 import com.kuaigui.yueche.driver.base.view.BaseActivity;
+import com.kuaigui.yueche.driver.main.WelcomeActivity;
+import com.kuaigui.yueche.driver.main.login.LoginActivity;
 import com.kuaigui.yueche.driver.main.order.fragment.CompleteOrderFragment;
 import com.kuaigui.yueche.driver.main.order.fragment.TodayPerformanceDialogFragment;
 import com.kuaigui.yueche.driver.main.order.fragment.WaitOrderFragment;
+import com.kuaigui.yueche.driver.util.BaseUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +42,8 @@ public class OrderActivity extends BaseActivity {
     private List<Fragment> mOrderFragmentList = new ArrayList<>();
     private BaseFragmentPagerAdapter mFragmentPagerAdapter;
     private String[] tabTitles = {"待接单", "已接单"};
+    private final static String EXTRA_LONGITUDE = "EXTRA_LONGITUDE";
+    private final static String EXTRA_LATITUDE = "EXTRA_LATITUDE";
 
     @Override
     public int setLayout() {
@@ -47,9 +53,10 @@ public class OrderActivity extends BaseActivity {
     @Override
     public void initView() {
         mTitleTv.setText(R.string.order_title);
-
-        mOrderFragmentList.add(WaitOrderFragment.newInstance());
-        mOrderFragmentList.add(CompleteOrderFragment.newInstance());
+        String longitude = getIntent().getStringExtra(EXTRA_LONGITUDE);
+        String latitude = getIntent().getStringExtra(EXTRA_LATITUDE);
+        mOrderFragmentList.add(WaitOrderFragment.newInstance(longitude, latitude));
+        mOrderFragmentList.add(CompleteOrderFragment.newInstance(longitude, latitude));
 
         mFragmentPagerAdapter = new BaseFragmentPagerAdapter(getSupportFragmentManager(), mOrderFragmentList);
         mOrderVp.setAdapter(mFragmentPagerAdapter);
@@ -114,6 +121,10 @@ public class OrderActivity extends BaseActivity {
                 // TODO: 2018/10/14  
                 //收车后操作
                 performance.dismiss();
+                BaseUtils.removeLoginInfo();
+                Intent intent = new Intent(OrderActivity.this, LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
             }
         });
         performance.show(mFragTransaction, "TodayPerformanceDialogFragment");

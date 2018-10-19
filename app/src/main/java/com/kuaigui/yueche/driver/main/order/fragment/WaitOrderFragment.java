@@ -68,18 +68,26 @@ public class WaitOrderFragment extends BaseFragment implements IResultView {
     private BaseRecycleAdapter<RootOrderListBean.DataBean> mWaitOrderAdapter;
 
     private int pageNumber = 1;
+    private final static String ARGS_LONGITUDE = "args_longitude";
+    private final static String ARGS_LATITUDE = "args_latitude";
 
-    public static WaitOrderFragment newInstance() {
+    public static WaitOrderFragment newInstance(String longitude, String latitude) {
         Bundle args = new Bundle();
+        args.putString(ARGS_LONGITUDE, longitude);
+        args.putString(ARGS_LATITUDE, latitude);
         WaitOrderFragment fragment = new WaitOrderFragment();
         fragment.setArguments(args);
         return fragment;
     }
 
+    private String curLongitude;
+    private String curLatitude;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
+        curLongitude = getArguments().getString(ARGS_LONGITUDE);
+        curLatitude = getArguments().getString(ARGS_LATITUDE);
         if (view == null) {
             view = inflater.inflate(R.layout.fragment_order, container, false);
             unbinder = ButterKnife.bind(this, view);
@@ -160,8 +168,8 @@ public class WaitOrderFragment extends BaseFragment implements IResultView {
     private void getOrderList() {
         OkRequestParams params = new OkRequestParams();
         params.put("mobile", BaseUtils.getMobile());
-        params.put("longitude", "113.880714");
-        params.put("latitude", "22.560353");
+        params.put("longitude", curLongitude);
+        params.put("latitude", curLatitude);
         params.put("state", TypeConstant.WAIT_ORDER);
         params.put("page", pageNumber);
         params.put("pageSize", 10);

@@ -16,6 +16,7 @@ import com.kuaigui.yueche.driver.mvc.BaseController;
 import com.kuaigui.yueche.driver.mvc.IResultView;
 import com.kuaigui.yueche.driver.okhttp.OkRequestParams;
 import com.kuaigui.yueche.driver.util.AbJsonUtil;
+import com.kuaigui.yueche.driver.util.AbToastUtil;
 import com.kuaigui.yueche.driver.util.BaseUtils;
 import com.kuaigui.yueche.driver.util.CustomProgress;
 
@@ -145,6 +146,8 @@ public class ConfirmOrderActivity extends BaseActivity implements IResultView {
                     intent.putExtra("orderData", mOrderData);
                     startActivity(intent);
                     finish();
+                } else {
+                    AbToastUtil.showToast(this, pickupBean.getMessage());
                 }
             }
         }

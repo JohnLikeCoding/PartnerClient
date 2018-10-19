@@ -15,9 +15,23 @@ android {
         multiDexEnabled true
 
     }
+    signingConfigs {
+        myConfig {
+            storeFile file("../buildsystem/reserve_client.jks")
+            storePassword SIGN_STORE_PASSWORD
+            keyAlias SIGN_KEY_ALIAS
+            keyPassword SIGN_KEY_PASSWORD
+        }
+    }
     buildTypes {
+        debug {
+            minifyEnabled false
+            signingConfig signingConfigs.myConfig
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
         release {
             minifyEnabled false
+            signingConfig signingConfigs.myConfig
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -38,11 +52,9 @@ dependencies {
     //多包依赖--start
     compile 'com.android.support:multidex:1.0.1'
     //多包依赖--end
-
     //kotlin支持--start
     compile "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
     //kotlin支持--end
-
     //android支持资源--start
     compile "com.android.support:appcompat-v7:$ANDROID_SUPPORT_VERSION"
     compile("com.android.support:design:$ANDROID_SUPPORT_VERSION") {
@@ -51,15 +63,12 @@ dependencies {
     }
     compile "com.android.support.constraint:constraint-layout:$CONSTRAINT_VERSION"
     //android支持资源--end
-
     //cardView--start
     compile "com.android.support:cardview-v7:$ANDROID_SUPPORT_VERSION"
     //cardView--end
-
     //recycleView--start
     compile "com.android.support:recyclerview-v7:$ANDROID_SUPPORT_VERSION"
     //recycleView--end
-
     //rxjava依赖--start
     compile("com.squareup.retrofit2:adapter-rxjava2:$RETROFIT2_ADAPTER_VERSION") {
         exclude module: "rxjava"
@@ -70,7 +79,6 @@ dependencies {
     }
     compile "io.reactivex.rxjava2:rxjava:$RX_JAVA2_VERSION"
     //rxjava依赖--end
-
     //网络请求依赖--start
     compile("com.squareup.retrofit2:retrofit:$RETROFIT2_VERSION") {
         exclude group: "com.squareup.okhttp3"
@@ -94,31 +102,25 @@ dependencies {
         exclude group: "com.android.support"
     }
     //图片加载框架 end
-
     //通用工具库--start
-//    compile project(':qnbaselibrary')
+    //    compile project(':qnbaselibrary')
     //通用工具库--end
-
     //通用rv适配器--start
-//    compile project(':baseadapter-recyclerview')
+    //    compile project(':baseadapter-recyclerview')
     //通用rv适配器--end
-
     compile('com.zhy:okhttputils:2.6.2') {
         exclude module: 'okhttp'
     }
-
     compile('com.jakewharton:butterknife:8.5.1') {
         exclude group: "com.android.support"
     }
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
-
     //刷新加载框架start
     compile 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.5.1'
     //刷新加载框架end
-
     //权限框架start
-    compile "com.github.hotchemi:permissionsdispatcher:3.1.0"
+    compile 'com.github.hotchemi:permissionsdispatcher:3.1.0'
     annotationProcessor "com.github.hotchemi:permissionsdispatcher-processor:3.1.0"
     //权限框架end
-
+    compile files('libs/AMap3DMap_6.4.1_AMapNavi_6.3.0_AMapSearch_6.1.0_AMapLocation_4.2.0_20180906.jar')
 }

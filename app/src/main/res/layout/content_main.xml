@@ -87,8 +87,8 @@
 
     </LinearLayout>
 
-    <View
-        android:id="@+id/map"
+    <com.amap.api.maps.MapView
+        android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="@dimen/space_160"
         android:layout_below="@+id/basic_info_ll"/>
@@ -96,7 +96,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/map"
+        android:layout_below="@+id/mapView"
         android:background="@color/color_white"
         android:orientation="horizontal"
         android:paddingBottom="@dimen/space_20"
