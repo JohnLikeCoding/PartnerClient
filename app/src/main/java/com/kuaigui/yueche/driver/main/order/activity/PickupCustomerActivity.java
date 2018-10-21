@@ -15,6 +15,8 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,8 +31,6 @@ import com.amap.api.maps.MapView;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.CameraPosition;
 import com.amap.api.maps.model.LatLng;
-import com.amap.api.maps.model.Marker;
-import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.services.core.AMapException;
 import com.amap.api.services.core.LatLonPoint;
@@ -42,6 +42,12 @@ import com.amap.api.services.geocoder.RegeocodeQuery;
 import com.amap.api.services.geocoder.RegeocodeResult;
 import com.amap.api.services.poisearch.PoiResult;
 import com.amap.api.services.poisearch.PoiSearch;
+import com.amap.api.services.route.BusRouteResult;
+import com.amap.api.services.route.DrivePath;
+import com.amap.api.services.route.DriveRouteResult;
+import com.amap.api.services.route.RideRouteResult;
+import com.amap.api.services.route.RouteSearch;
+import com.amap.api.services.route.WalkRouteResult;
 import com.kuaigui.yueche.driver.MyApplication;
 import com.kuaigui.yueche.driver.R;
 import com.kuaigui.yueche.driver.base.view.BaseActivity;
@@ -50,6 +56,8 @@ import com.kuaigui.yueche.driver.bean.RootOrderListBean;
 import com.kuaigui.yueche.driver.constant.Api;
 import com.kuaigui.yueche.driver.constant.Constant;
 import com.kuaigui.yueche.driver.constant.TypeConstant;
+import com.kuaigui.yueche.driver.main.order.utils.AMapUtil;
+import com.kuaigui.yueche.driver.main.order.utils.DrivingRouteOverlay;
 import com.kuaigui.yueche.driver.mvc.BaseController;
 import com.kuaigui.yueche.driver.mvc.IResultView;
 import com.kuaigui.yueche.driver.okhttp.OkRequestParams;
@@ -76,7 +84,7 @@ import permissions.dispatcher.RuntimePermissions;
  */
 @RuntimePermissions
 public class PickupCustomerActivity extends BaseActivity implements IResultView,
-        LocationSource, AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener, PoiSearch.OnPoiSearchListener {
+        LocationSource, AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener, PoiSearch.OnPoiSearchListener, RouteSearch.OnRouteSearchListener {
 
     @BindView(R.id.title_tv)
     TextView mTitleTv;
@@ -88,8 +96,6 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
     TextView mLocalTv;
     @BindView(R.id.time_tv)
     TextView mTimeTv;
-    @BindView(R.id.map)
-    View mMap;
     @BindView(R.id.head_iv)
     CircleImageView mHeadIv;
     @BindView(R.id.name_tv)
@@ -98,6 +104,20 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
     TextView mStartTv;
     @BindView(R.id.end_tv)
     TextView mEndTv;
+    @BindView(R.id.nav_tv)
+    TextView navTv;
+    @BindView(R.id.basic_info_ll)
+    LinearLayout basicInfoLl;
+    @BindView(R.id.mapView)
+    MapView mapView;
+    @BindView(R.id.cancel_order_tv)
+    TextView cancelOrderTv;
+    @BindView(R.id.confirm_order_tv)
+    TextView confirmOrderTv;
+    @BindView(R.id.action_ll)
+    LinearLayout actionLl;
+    @BindView(R.id.call_iv)
+    ImageView callIv;
 
     private RootOrderListBean.DataBean mOrderData;
 
@@ -105,7 +125,12 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
     MapView mMapView;
     private AMap aMap;
     private AMapLocationClient mLocationClient;
-    private LocationSource.OnLocationChangedListener mListener;
+    private OnLocationChangedListener mListener;
+    private DriveRouteResult mDriveRouteResult;
+    private LatLonPoint mStartLatLonPoint;
+    private GeocodeSearch geocoderSearch;
+    private LatLonPoint mEndPoint;
+    private RouteSearch mRouteSearch;
 
     @Override
     public int setLayout() {
@@ -115,6 +140,14 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
     @Override
     public void initView() {
         mTitleTv.setText("接乘客");
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mMapView = (MapView) findViewById(R.id.mapView);
+        mMapView.onCreate(savedInstanceState);
+        initMap();
     }
 
     private void initMap() {
@@ -162,6 +195,12 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
         aMap.setMyLocationStyle(myLocationStyle);
         aMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
         aMap.setMyLocationType(AMap.LOCATION_TYPE_LOCATE);
+
+        geocoderSearch = new GeocodeSearch(this);
+        geocoderSearch.setOnGeocodeSearchListener(this);
+
+        mRouteSearch = new RouteSearch(this);
+        mRouteSearch.setRouteSearchListener(this);
     }
 
     @Override
@@ -169,6 +208,7 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
         mController = new BaseController(this);
 
         mOrderData = getIntent().getParcelableExtra("orderData");
+        mEndPoint = new LatLonPoint(Double.parseDouble(mOrderData.getLatitude()), Double.parseDouble(mOrderData.getLongitude()));
         SpannableString placeString = new SpannableString("去" + mOrderData.getDeparture());
         ForegroundColorSpan colorSpan = new ForegroundColorSpan(ContextCompat.getColor(this, R.color.color_1bb671));
         if (!TextUtils.isEmpty(mOrderData.getDeparture())) {
@@ -191,7 +231,7 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.nav_tv:
-                // TODO: 2018/10/12 0012 导航去预定地点
+                searchRouteResult(ROUTE_TYPE_DRIVE, RouteSearch.DRIVING_SINGLE_DEFAULT);
                 break;
             case R.id.cancel_order_tv:
                 Intent intent = new Intent(this, ReasonActivity.class);
@@ -209,6 +249,7 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
     }
 
     private void pickupCustomer() {
+        // TODO: 2018/10/21 需要使用乘客的起始点地址
         OkRequestParams params = new OkRequestParams();
         params.put("orderNo", mOrderData.getOrderNo());
         params.put("longitude", "113.880714");
@@ -290,7 +331,6 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
     }
 
     private LatLng curLatLng;
-    private Marker mLocMarker;
     private boolean hasLocation;
 
     @Override
@@ -300,16 +340,11 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
                 mListener.onLocationChanged(aMapLocation);
                 curLatLng = new LatLng(aMapLocation.getLatitude(), aMapLocation.getLongitude());
 //                QNLogUtils.log("ReserveActivity", "onLocationChanged:$curLatLng")
-                if (mLocMarker == null) {
-                    mLocMarker = addMarker(curLatLng, R.drawable.local1);
-                } else {
-                    mLocMarker.setPosition(curLatLng);
-                }
                 curAddress = aMapLocation.getAddress();
                 aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(curLatLng, 18f));//后一个参数表示缩放倍数，4-20
                 hasLocation = true;
                 //获取定位位置周边的地址
-                mSearchLatLonPoint = new LatLonPoint(curLatLng.latitude, curLatLng.longitude);
+                mStartLatLonPoint = new LatLonPoint(curLatLng.latitude, curLatLng.longitude);
 
                 geoAddress();
             } else {
@@ -319,18 +354,6 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
             }
         }
     }
-
-    /**
-     * 设置地图上的标示
-     */
-    private Marker addMarker(LatLng curLatLng, int resIcon) {
-        MarkerOptions options = new MarkerOptions();
-        options.icon(BitmapDescriptorFactory.fromResource(resIcon));
-        options.anchor(0.5f, 0.5f);
-        options.position(curLatLng);
-        return aMap.addMarker(options);
-    }
-
 
     @Override
     public void activate(OnLocationChangedListener onLocationChangedListener) {
@@ -372,16 +395,13 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
         mLocationClient = null;
     }
 
-    private LatLonPoint mSearchLatLonPoint;
-    private GeocodeSearch geocoderSearch;
-
     /**
      * 响应逆地理编码
      */
     public void geoAddress() {
         showDialog();
-        if (mSearchLatLonPoint != null) {
-            RegeocodeQuery query = new RegeocodeQuery(mSearchLatLonPoint, 200, GeocodeSearch.AMAP);// 第一个参数表示一个Latlng，第二参数表示范围多少米，第三个参数表示是火系坐标系还是GPS原生坐标系
+        if (mStartLatLonPoint != null) {
+            RegeocodeQuery query = new RegeocodeQuery(mStartLatLonPoint, 200, GeocodeSearch.AMAP);// 第一个参数表示一个Latlng，第二参数表示范围多少米，第三个参数表示是火系坐标系还是GPS原生坐标系
             geocoderSearch.getFromLocationAsyn(query);
         }
     }
@@ -389,6 +409,8 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
     private ProgressDialog progressDialog;
 
     private void showDialog() {
+        if (progressDialog == null)
+            progressDialog = new ProgressDialog(this);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setIndeterminate(false);
         progressDialog.setCancelable(true);
@@ -403,6 +425,7 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
     }
 
     private String curAddress;
+    private final static int ROUTE_TYPE_DRIVE = 2;
 
     @Override
     public void onRegeocodeSearched(RegeocodeResult regeocodeResult, int rCode) {
@@ -414,7 +437,7 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
                         regeocodeResult.getRegeocodeAddress().getCity() +
                         regeocodeResult.getRegeocodeAddress().getDistrict() +
                         regeocodeResult.getRegeocodeAddress().getTownship();
-//                firstItem = new PoiItem("regeo", mSearchLatLonPoint, address, address);
+//                firstItem = new PoiItem("regeo", mStartLatLonPoint, address, address);
 //                doSearchQuery();
                 curAddress = regeocodeResult.getRegeocodeAddress().getFormatAddress();
                 List<AoiItem> aois = regeocodeResult.getRegeocodeAddress().getAois();
@@ -423,11 +446,48 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
                     curAddress = pos.getAoiName();
 
                 }
-
             }
         } else {
             Toast.makeText(PickupCustomerActivity.this, "error code is " + rCode, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /**
+     * 开始搜索路径规划方案
+     */
+    public void searchRouteResult(int routeType, int mode) {
+        if (mStartLatLonPoint == null) {
+            AbToastUtil.showToast(this, "起点未设置");
+            return;
+        }
+        if (mEndPoint == null) {
+            AbToastUtil.showToast(this, "终点未设置");
+        }
+        showProgressDialog();
+        final RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(
+                mStartLatLonPoint, mEndPoint);
+        if (routeType == ROUTE_TYPE_DRIVE) {// 驾车路径规划
+            // 第一个参数表示路径规划的起点和终点，第二个参数表示驾车模式，
+            // 第三个参数表示途经点，第四个参数表示避让区域，第五个参数表示避让道路
+            RouteSearch.DriveRouteQuery query = new RouteSearch.DriveRouteQuery(fromAndTo, mode, null,
+                    null, "");
+            mRouteSearch.calculateDriveRouteAsyn(query);// 异步路径规划驾车模式查询
+        }
+    }
+
+    private ProgressDialog progDialog = null;// 搜索时进度条
+
+    /**
+     * 显示进度框
+     */
+    private void showProgressDialog() {
+        if (progDialog == null)
+            progDialog = new ProgressDialog(this);
+        progDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progDialog.setIndeterminate(false);
+        progDialog.setCancelable(true);
+        progDialog.setMessage("正在搜索...");
+        progDialog.show();
     }
 
     @Override
@@ -486,5 +546,65 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
         if (null != mLocationClient) {
             mLocationClient.onDestroy();
         }
+    }
+
+    @Override
+    public void onBusRouteSearched(BusRouteResult busRouteResult, int i) {
+
+    }
+
+    /**
+     * 隐藏进度框
+     */
+    private void dissmissProgressDialog() {
+        if (progDialog != null) {
+            progDialog.dismiss();
+        }
+    }
+
+    @Override
+    public void onDriveRouteSearched(DriveRouteResult driveRouteResult, int errorCode) {
+        dissmissProgressDialog();
+        aMap.clear();// 清理地图上的所有覆盖物
+        if (errorCode == 1000) {
+            if (driveRouteResult != null && driveRouteResult.getPaths() != null) {
+                if (driveRouteResult.getPaths().size() > 0) {
+                    mDriveRouteResult = driveRouteResult;
+                    final DrivePath drivePath = mDriveRouteResult.getPaths()
+                            .get(0);
+                    DrivingRouteOverlay drivingRouteOverlay = new DrivingRouteOverlay(
+                            this, aMap, drivePath,
+                            mDriveRouteResult.getStartPos(),
+                            mDriveRouteResult.getTargetPos(), null);
+                    drivingRouteOverlay.setNodeIconVisibility(false);//设置节点marker是否显示
+                    drivingRouteOverlay.setIsColorfulline(true);//是否用颜色展示交通拥堵情况，默认true
+                    drivingRouteOverlay.removeFromMap();
+                    drivingRouteOverlay.addToMap();
+                    drivingRouteOverlay.zoomToSpan();
+
+                    int dis = (int) drivePath.getDistance();
+                    int dur = (int) drivePath.getDuration();
+                    mLocalTv.setText("全程" + AMapUtil.getFriendlyLength(dis));
+                    mTimeTv.setText("耗时" + AMapUtil.getFriendlyTime(dur));
+                } else if (driveRouteResult != null && driveRouteResult.getPaths() == null) {
+                    AbToastUtil.showToast(this, "路径规划失败，请重试！");
+                }
+
+            } else {
+                AbToastUtil.showToast(this, "路径规划失败，请重试！");
+            }
+        } else {
+            AbToastUtil.showToast(this.getApplicationContext(), errorCode);
+        }
+    }
+
+    @Override
+    public void onWalkRouteSearched(WalkRouteResult walkRouteResult, int i) {
+
+    }
+
+    @Override
+    public void onRideRouteSearched(RideRouteResult rideRouteResult, int i) {
+
     }
 }
