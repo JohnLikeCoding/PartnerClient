@@ -1,5 +1,7 @@
 package com.kuaigui.yueche.driver.main.about;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -7,6 +9,7 @@ import android.widget.TextView;
 import com.kuaigui.yueche.driver.MyApplication;
 import com.kuaigui.yueche.driver.R;
 import com.kuaigui.yueche.driver.base.view.BaseActivity;
+import com.kuaigui.yueche.driver.main.protocol.ProtocolActivity;
 import com.kuaigui.yueche.driver.util.AbAppUtil;
 
 import butterknife.BindView;
@@ -54,10 +57,11 @@ public class AboutActivity extends BaseActivity {
                 finish();
                 break;
             case R.id.agreement_ll:
-                // TODO: 2018/10/9 0009
+                startActivity(ProtocolActivity.getCallIntent(this));
                 break;
             case R.id.contact_ll:
-                // TODO: 2018/10/9 0009
+                Intent dialIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:0851-84777300"));//跳转到拨号界面，同时传递电话号码
+                startActivity(dialIntent);
                 break;
         }
     }

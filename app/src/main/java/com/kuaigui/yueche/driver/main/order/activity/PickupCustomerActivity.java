@@ -208,7 +208,7 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
         mController = new BaseController(this);
 
         mOrderData = getIntent().getParcelableExtra("orderData");
-        mEndPoint = new LatLonPoint(Double.parseDouble(mOrderData.getLatitude()), Double.parseDouble(mOrderData.getLongitude()));
+        mEndPoint = new LatLonPoint(Double.parseDouble(mOrderData.getDepLatitude()), Double.parseDouble(mOrderData.getDepLongitude()));
         SpannableString placeString = new SpannableString("去" + mOrderData.getDeparture());
         ForegroundColorSpan colorSpan = new ForegroundColorSpan(ContextCompat.getColor(this, R.color.color_1bb671));
         if (!TextUtils.isEmpty(mOrderData.getDeparture())) {
@@ -249,11 +249,10 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
     }
 
     private void pickupCustomer() {
-        // TODO: 2018/10/21 需要使用乘客的起始点地址
         OkRequestParams params = new OkRequestParams();
-        params.put("orderNo", mOrderData.getOrderNo());
-        params.put("longitude", "113.880714");
-        params.put("latitude", "22.560353");
+        params.put("orderNo", mOrderData.getOrderNo()+"");
+        params.put("longitude",mOrderData.getDepLongitude());
+        params.put("latitude", mOrderData.getDepLatitude());
         mController.doPostRequest(Api.PICKUP_CUSTOMER, "pickupCustomer", params);
     }
 

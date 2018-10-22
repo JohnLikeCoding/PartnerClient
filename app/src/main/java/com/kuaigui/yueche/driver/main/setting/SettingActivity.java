@@ -9,9 +9,11 @@ import com.kuaigui.yueche.driver.MyApplication;
 import com.kuaigui.yueche.driver.R;
 import com.kuaigui.yueche.driver.base.view.BaseActivity;
 import com.kuaigui.yueche.driver.main.about.AboutActivity;
+import com.kuaigui.yueche.driver.main.login.LoginActivity;
 import com.kuaigui.yueche.driver.mvc.BaseController;
 import com.kuaigui.yueche.driver.mvc.IResultView;
 import com.kuaigui.yueche.driver.util.AbAppUtil;
+import com.kuaigui.yueche.driver.util.BaseUtils;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -65,7 +67,6 @@ public class SettingActivity extends BaseActivity implements IResultView {
                 startActivity(new Intent(SettingActivity.this, AboutActivity.class));
                 break;
             case R.id.logout_btn:
-                // TODO: 2018/10/11 0011 退出登录
                 logout();
                 break;
         }
@@ -76,7 +77,10 @@ public class SettingActivity extends BaseActivity implements IResultView {
     }
 
     private void logout() {
-
+        BaseUtils.removeLoginInfo();
+        Intent intent = new Intent(SettingActivity.this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     @Override

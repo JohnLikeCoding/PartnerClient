@@ -1,7 +1,14 @@
 package com.kuaigui.yueche.driver.main.login;
 
+import android.Manifest;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.CountDownTimer;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
@@ -25,6 +32,9 @@ import com.kuaigui.yueche.driver.util.RegularUtil;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.OnPermissionDenied;
+import permissions.dispatcher.RuntimePermissions;
 
 /**
  * 作者: zengxc
@@ -32,6 +42,7 @@ import butterknife.OnClick;
  * 时间: 2018/10/09 16:03
  */
 
+@RuntimePermissions
 public class LoginActivity extends BaseActivity implements IResultView {
 
     @BindView(R.id.back_iv)
@@ -59,8 +70,10 @@ public class LoginActivity extends BaseActivity implements IResultView {
 
     @Override
     public void initView() {
+        LoginActivityPermissionsDispatcher.needLocationWithPermissionCheck(this);
         mBackIv.setImageResource(R.drawable.back);
         mTitleTv.setText(R.string.login_title);
+
     }
 
     @Override
@@ -164,6 +177,8 @@ public class LoginActivity extends BaseActivity implements IResultView {
     @Override
     protected void onDestroy() {
         cancelTimer();
+        if (mDialog != null)
+            mDialog.dismiss();
         super.onDestroy();
     }
 
@@ -187,6 +202,58 @@ public class LoginActivity extends BaseActivity implements IResultView {
         }
     }
 
+    @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+    void needLocation() {
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        LoginActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
+
+    @OnPermissionDenied({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+    void remindLocation() {
+        initDialog();
+        mDialog.show();
+    }
+
+    private Dialog mDialog;
+
+    private void initDialog() {
+        if (mDialog == null)
+            mDialog = new AlertDialog.Builder(this)
+                    .setTitle("定位权限设置")//设置对话框的标题
+                    .setMessage("使用地图功能，需要定位权限")//设置对话框的内容
+                    //设置对话框的按钮
+                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    })
+
+                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            goIntentSetting();
+                        }
+                    })
+                    .create();
+    }
+
+    private void goIntentSetting() {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getPackageName(), null);
+        intent.setData(uri);
+        try {
+            startActivity(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public class MyTimer extends CountDownTimer {
 

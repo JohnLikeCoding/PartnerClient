@@ -2,6 +2,8 @@ package com.kuaigui.yueche.driver.main.order.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -32,6 +34,8 @@ import com.zhy.http.okhttp.OkHttpUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -82,12 +86,14 @@ public class WaitOrderFragment extends BaseFragment implements IResultView {
 
     private String curLongitude;
     private String curLatitude;
+    private Handler mHandler;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         curLongitude = getArguments().getString(ARGS_LONGITUDE);
         curLatitude = getArguments().getString(ARGS_LATITUDE);
+        mHandler = new Handler(Looper.getMainLooper());
         if (view == null) {
             view = inflater.inflate(R.layout.fragment_order, container, false);
             unbinder = ButterKnife.bind(this, view);
@@ -112,9 +118,27 @@ public class WaitOrderFragment extends BaseFragment implements IResultView {
         mController = new BaseController(this);
     }
 
+    private Timer mOrderTimer;
+
     @Override
     protected void initData() {
         getLastData();
+    }
+
+    public void startTask() {
+        if (mOrderTimer == null) {
+            mOrderTimer = new Timer();
+            MyOrderTask task = new MyOrderTask();
+            //20s刷新一次，刚进来不刷新
+            mOrderTimer.schedule(task, 20 * 1000, 20 * 1000);
+        }
+    }
+
+    public void cancelTask() {
+        if (mOrderTimer != null) {
+            mOrderTimer.cancel();
+            mOrderTimer = null;
+        }
     }
 
     private void setListener() {
@@ -146,7 +170,7 @@ public class WaitOrderFragment extends BaseFragment implements IResultView {
                 mOrderTypeTv.setText("专车");
 //                mTimeTv.setText(AbDateUtil.getStringByFormat(item.getOrderTime(), dateFormatYMDHMS2));
                 mTimeTv.setText(item.getOrderTimeStr());
-                mDistanceTv.setText(item.getDistance());//显示规则是什么
+                mDistanceTv.setText(item.getDistance() + "");//显示规则是什么
                 mStartTv.setText(item.getDeparture());
                 mEndTv.setText(item.getDestination());
 
@@ -179,7 +203,7 @@ public class WaitOrderFragment extends BaseFragment implements IResultView {
     /**
      * 获取最新列表
      */
-    private void getLastData() {
+    public void getLastData() {
         mRefreshLayout.setNoMoreData(false);
         pageNumber = 1;
         getOrderList();
@@ -207,11 +231,11 @@ public class WaitOrderFragment extends BaseFragment implements IResultView {
                 if (orderListBean.getCode() == Api.CODE_SUCCESS) {
                     mHasLoadedOnce = true;
 
-                    if (!mRefreshLayout.isLoading()) {
+                    if (mRefreshLayout == null || !mRefreshLayout.isLoading()) {
                         mWaitOrderList.clear();
                     }
-
-                    mRefreshLayout.setNoMoreData(orderListBean.getData().size() == 0);
+                    if (mRefreshLayout != null)
+                        mRefreshLayout.setNoMoreData(orderListBean.getData().size() == 0);
                     mWaitOrderList.addAll(orderListBean.getData());
                     mWaitOrderAdapter.updateView(mWaitOrderList);
                 }
@@ -244,8 +268,27 @@ public class WaitOrderFragment extends BaseFragment implements IResultView {
     @Override
     public void onDestroyView() {
         OkHttpUtils.getInstance().cancelTag(this);
+        cancelTask();
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    private Runnable refreshRunnable = new Runnable() {
+        @Override
+        public void run() {
+            getLastData();
+        }
+    };
+
+    /**
+     * 实现定时刷新订单信息
+     */
+    private class MyOrderTask extends TimerTask {
+
+        @Override
+        public void run() {
+            mHandler.post(refreshRunnable);
+        }
     }
 
 }

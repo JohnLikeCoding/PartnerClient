@@ -183,7 +183,7 @@ public class SendCustomerActivity extends BaseActivity implements IResultView, L
         mController = new BaseController(this);
 
         mOrderData = getIntent().getParcelableExtra("orderData");
-        mEndPoint = new LatLonPoint(Double.parseDouble(mOrderData.getLatitude()), Double.parseDouble(mOrderData.getLongitude()));
+        mEndPoint = new LatLonPoint(Double.parseDouble(mOrderData.getDestLatitude()), Double.parseDouble(mOrderData.getDestLongitude()));
 
         mLocalTv.setText("当前位置");
         mTimeTv.setText("6分钟");
@@ -209,9 +209,9 @@ public class SendCustomerActivity extends BaseActivity implements IResultView, L
 
     private void confirmSendCustomer() {
         OkRequestParams params = new OkRequestParams();
-        params.put("orderNo", mOrderData.getOrderNo());
-        params.put("longitude", "113.880714");
-        params.put("latitude", "22.560353");
+        params.put("orderNo", mOrderData.getOrderNo()+"");
+        params.put("longitude", mOrderData.getDestLongitude());
+        params.put("latitude", mOrderData.getDestLatitude());
         mController.doPostRequest(Api.CONFIRM_SEND, "confirmSendCustomer", params);
     }
 

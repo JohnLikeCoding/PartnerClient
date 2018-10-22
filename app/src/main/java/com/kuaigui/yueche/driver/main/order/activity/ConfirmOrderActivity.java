@@ -1,17 +1,21 @@
 package com.kuaigui.yueche.driver.main.order.activity;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.CountDownTimer;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.kuaigui.yueche.driver.R;
 import com.kuaigui.yueche.driver.base.view.BaseActivity;
+import com.kuaigui.yueche.driver.bean.CheckOrderInfo;
 import com.kuaigui.yueche.driver.bean.RootCommonBean;
 import com.kuaigui.yueche.driver.bean.RootOrderListBean;
 import com.kuaigui.yueche.driver.constant.Api;
 import com.kuaigui.yueche.driver.constant.TypeConstant;
+import com.kuaigui.yueche.driver.enums.OrderStatus;
 import com.kuaigui.yueche.driver.mvc.BaseController;
 import com.kuaigui.yueche.driver.mvc.IResultView;
 import com.kuaigui.yueche.driver.okhttp.OkRequestParams;
@@ -62,19 +66,21 @@ public class ConfirmOrderActivity extends BaseActivity implements IResultView {
 
     }
 
+
     @Override
     public void initData() {
         mOrderData = getIntent().getParcelableExtra("orderData");
         mOrderTypeTv.setText("专车");
 //                mTimeTv.setText(AbDateUtil.getStringByFormat(item.getOrderTime(), dateFormatYMDHMS2));
 //        mTimeTv.setText(mOrderData.getOrderTimeStr());//看UI应该是预约订单才有显示
-        mDistanceTv.setText(mOrderData.getDistance());//显示规则是什么
+        mDistanceTv.setText(mOrderData.getDistance() + "");//显示规则是什么
         mStartTv.setText(mOrderData.getDeparture());
         mEndTv.setText(mOrderData.getDestination());
 
         mController = new BaseController(this);
 
     }
+
 
     @OnClick({R.id.confirm_order_btn, R.id.cancel_order_btn})
     public void onViewClicked(View view) {
@@ -93,7 +99,7 @@ public class ConfirmOrderActivity extends BaseActivity implements IResultView {
 
     private void pickupOrder() {
         OkRequestParams params = new OkRequestParams();
-        params.put("orderNo", mOrderData.getOrderNo());
+        params.put("orderNo", mOrderData.getOrderNo() + "");
         params.put("mobile", BaseUtils.getMobile());
         mController.doPostRequest(Api.PICKUP_ORDER, "pickupOrder", params);
     }
@@ -145,6 +151,12 @@ public class ConfirmOrderActivity extends BaseActivity implements IResultView {
                     Intent intent = new Intent(this, PickupCustomerActivity.class);
                     intent.putExtra("orderData", mOrderData);
                     startActivity(intent);
+
+                    Intent broadIntent = new Intent(OrderActivity.ACTION_BROADCAST_CHECK_ORDER);
+                    broadIntent.putExtra(OrderActivity.EXTRA_BROADCAST_ORDER_STATE, OrderActivity.BROADCAST_ORDER_STATE_DONE);
+                    broadIntent.putExtra(OrderActivity.EXTRA_BROADCAST_ORDER_STATE, OrderActivity.BROADCAST_ORDER_STATE_DONE);
+                    broadIntent.putExtra(OrderActivity.EXTRA_BROADCAST_ORDER_NO, mOrderData.getOrderNo() + "");
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(broadIntent);
                     finish();
                 } else {
                     AbToastUtil.showToast(this, pickupBean.getMessage());

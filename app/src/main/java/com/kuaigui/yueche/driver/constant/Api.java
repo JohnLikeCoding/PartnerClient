@@ -22,9 +22,15 @@ public class Api {
 
     public static final String MY_PERFORMANCE = BASE_URL + "driver/info/performance";
 
+    public static final String PROGRESSINFO = BASE_URL + "order/progressinfo/driver";
+
+    public static final String LOCATE = BASE_URL + "driver/locate";
+
     public static final String ONLINE = BASE_URL + "driver/clockin";
 
     public static final String OFFLINE = BASE_URL + "driver/offline";
+
+    public static final String CHECK_ORDER = BASE_URL + "order/state/check";
 
     public static final String PICKUP_ORDER = BASE_URL + "order/pickup";
 

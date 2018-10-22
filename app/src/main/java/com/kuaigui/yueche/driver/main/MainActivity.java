@@ -17,6 +17,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -35,8 +36,6 @@ import com.amap.api.maps.MapView;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.CameraPosition;
 import com.amap.api.maps.model.LatLng;
-import com.amap.api.maps.model.Marker;
-import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.services.core.AMapException;
 import com.amap.api.services.core.LatLonPoint;
@@ -51,12 +50,17 @@ import com.amap.api.services.poisearch.PoiSearch;
 import com.kuaigui.yueche.driver.MyApplication;
 import com.kuaigui.yueche.driver.R;
 import com.kuaigui.yueche.driver.base.view.BaseActivity;
+import com.kuaigui.yueche.driver.bean.ProgressOrderInfo;
 import com.kuaigui.yueche.driver.bean.RootCommonBean;
+import com.kuaigui.yueche.driver.bean.RootOrderListBean;
 import com.kuaigui.yueche.driver.constant.Api;
 import com.kuaigui.yueche.driver.constant.Constant;
+import com.kuaigui.yueche.driver.enums.OrderStatus;
 import com.kuaigui.yueche.driver.main.mine.AdviceActivity;
 import com.kuaigui.yueche.driver.main.mine.MyPerformanceActivity;
 import com.kuaigui.yueche.driver.main.order.activity.OrderActivity;
+import com.kuaigui.yueche.driver.main.order.activity.PickupCustomerActivity;
+import com.kuaigui.yueche.driver.main.order.activity.SendCustomerActivity;
 import com.kuaigui.yueche.driver.main.setting.SettingActivity;
 import com.kuaigui.yueche.driver.mvc.BaseController;
 import com.kuaigui.yueche.driver.mvc.IResultView;
@@ -129,7 +133,7 @@ public class MainActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         mMapView = (MapView) findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
-        fetchLocation();//获取定位权限
+        MainActivityPermissionsDispatcher.fetchLocationWithPermissionCheck(this);//获取定位权限
         initMap();
 
     }
@@ -214,6 +218,7 @@ public class MainActivity extends BaseActivity
         time = format.format(new Date(System.currentTimeMillis()));
         mCurrentTimeTv.setText(time);
 
+
     }
 
     private void initAction(boolean isOnline) {
@@ -226,8 +231,11 @@ public class MainActivity extends BaseActivity
 
     @Override
     public void initData() {
+        mDriverNumTv.setText(BaseUtils.getMobile());
         mHandler = new Handler(Looper.getMainLooper());
         mController = new BaseController(this);
+
+        fetchCurOrder();
     }
 
     @Override
@@ -277,10 +285,31 @@ public class MainActivity extends BaseActivity
                 }
                 break;
             case R.id.order_btn:
-                startActivity(new Intent(this, OrderActivity.class));
+                startActivity(OrderActivity.getCallIntent(this,curLatLng.longitude+"",curLatLng.latitude+""));
                 break;
         }
     }
+
+    /**
+     * 获取正在进行的订单
+     */
+    private void fetchCurOrder() {
+        OkRequestParams params = new OkRequestParams();
+        params.put("driverMobile", BaseUtils.getMobile());
+        mController.doPostRequest(Api.PROGRESSINFO, "progressinfo", params);
+    }
+
+    /**
+     * 上报位置信息
+     */
+    private void uploadPosition(String longitude, String latitude) {
+        OkRequestParams params = new OkRequestParams();
+        params.put("mobile", BaseUtils.getMobile());
+        params.put("longitude", longitude);
+        params.put("latitude", latitude);
+        mController.doPostRequest(Api.LOCATE, "locate", params);
+    }
+
 
     private void online() {
         if (curLatLng == null) {
@@ -316,6 +345,52 @@ public class MainActivity extends BaseActivity
     public void showResultView(String url, String type, String content) {
         CustomProgress.disMiss();
         switch (url) {
+            case Api.PROGRESSINFO:
+                ProgressOrderInfo orderInfo = AbJsonUtil.fromJson(content, ProgressOrderInfo.class);
+                if (orderInfo != null) {
+                    if (orderInfo.getCode() != Api.CODE_SUCCESS) {
+                        AbToastUtil.showToast(this, orderInfo.getMessage());
+                    } else {//根据订单状态跳到不同的界面中
+                        ProgressOrderInfo.DataBean data = orderInfo.getData();
+                        if (data == null) {
+                            return;
+                        }
+                        int state = Integer.parseInt(data.getState());
+                        RootOrderListBean.DataBean mOrderData = new RootOrderListBean.DataBean();
+                        mOrderData.setOrderNo(Long.parseLong(data.getOrderNo()));
+//                        mOrderData.setCommericalType(Integer.parseInt(data.getVehicleType()));
+//                        mOrderData.setOrderTime(Long.parseLong(data.getOr()));
+//                        mOrderData.setOrderTimeStr(data.get());
+//                        mOrderData.setDistance(data.getDeparture());
+                        mOrderData.setState(state);
+//                        mOrderData.setStateStr(data.getDeparture());
+                        mOrderData.setDeparture(data.getDeparture());
+                        mOrderData.setDestination(data.getDestination());
+                        mOrderData.setDepLatitude(data.getDepLatitude());
+                        mOrderData.setDepLongitude(data.getDepLongitude());
+                        mOrderData.setDestLatitude(data.getDestLatitude());
+                        mOrderData.setDestLongitude(data.getDestLongitude());
+
+                        if (state == OrderStatus.ORDER_DRIVER_TAKE.mOrderStatus) {//司机接单
+                            Intent intent = new Intent(this, PickupCustomerActivity.class);
+                            intent.putExtra("orderData", mOrderData);
+                            startActivity(intent);
+                        } else if (state == OrderStatus.ORDER_CUSTOMER_BOARDING.mOrderStatus) {//乘客上车
+                            Intent intent = new Intent(this, SendCustomerActivity.class);
+                            intent.putExtra("orderData", mOrderData);
+                            startActivity(intent);
+                        }
+                    }
+                }
+                break;
+            case Api.LOCATE://上报位置信息
+                RootCommonBean bean = AbJsonUtil.fromJson(content, RootCommonBean.class);
+                if (bean != null) {
+                    if (bean.getCode() != Api.CODE_SUCCESS) {
+                        Log.d("MainActivity", "LOCATE:" + bean.getMessage());
+                    }
+                }
+                break;
             case Api.ONLINE:
                 RootCommonBean onlineBean = AbJsonUtil.fromJson(content, RootCommonBean.class);
                 if (onlineBean != null) {
@@ -436,7 +511,6 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    private Marker mLocMarker;
     private boolean hasLocation;
     private String curAddress = "定位失败";
     private LatLng curLatLng;
@@ -456,12 +530,9 @@ public class MainActivity extends BaseActivity
             if (aMapLocation.getErrorCode() == 0) {
                 mListener.onLocationChanged(aMapLocation);
                 curLatLng = new LatLng(aMapLocation.getLatitude(), aMapLocation.getLongitude());
+                uploadPosition(curLatLng.longitude + "", curLatLng.latitude + "");
+
 //                QNLogUtils.log("ReserveActivity", "onLocationChanged:$curLatLng")
-                if (mLocMarker == null) {
-                    mLocMarker = addMarker(curLatLng, R.drawable.local1);
-                } else {
-                    mLocMarker.setPosition(curLatLng);
-                }
                 curAddress = aMapLocation.getAddress();
                 mHandler.post(new Runnable() {
                     @Override
@@ -473,7 +544,6 @@ public class MainActivity extends BaseActivity
                 hasLocation = true;
                 //获取定位位置周边的地址
                 mSearchLatLonPoint = new LatLonPoint(curLatLng.latitude, curLatLng.longitude);
-
                 geoAddress();
             } else {
                 String errText = "定位失败," + aMapLocation.getErrorCode() + ": " + aMapLocation.getErrorInfo();
@@ -482,18 +552,6 @@ public class MainActivity extends BaseActivity
             }
         }
     }
-
-    /**
-     * 设置地图上的标示
-     */
-    private Marker addMarker(LatLng curLatLng, int resIcon) {
-        MarkerOptions options = new MarkerOptions();
-        options.icon(BitmapDescriptorFactory.fromResource(resIcon));
-        options.anchor(0.5f, 0.5f);
-        options.position(curLatLng);
-        return aMap.addMarker(options);
-    }
-
 
     @Override
     public void activate(OnLocationChangedListener onLocationChangedListener) {
@@ -507,18 +565,20 @@ public class MainActivity extends BaseActivity
     private void location() {
         if (mLocationClient == null) {
             mLocationClient = new AMapLocationClient(this);
-            AMapLocationClientOption mLocationOption = new AMapLocationClientOption();
             //设置定位监听
             mLocationClient.setLocationListener(this);
-            //设置为高精度定位模式
-            mLocationOption.setOnceLocation(true);
-            mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
-            //设置定位参数
-            mLocationClient.setLocationOption(mLocationOption);
+
+            AMapLocationClientOption mLocationOption = new AMapLocationClientOption();
+            mLocationOption.setOnceLocation(false);
             // 此方法为每隔固定时间会发起一次定位请求，为了减少电量消耗或网络流量消耗，
             // 注意设置合适的定位时间的间隔（最小间隔支持为2000ms），并且在合适时间调用stopLocation()方法来取消定位请求
             // 在定位结束后，在合适的生命周期调用onDestroy()方法
             // 在单次定位情况下，定位无论成功与否，都无需调用stopLocation()方法移除请求，定位sdk内部会移除
+            mLocationOption.setInterval(20 * 1000L);
+            //设置为高精度定位模式
+            mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
+            //设置定位参数
+            mLocationClient.setLocationOption(mLocationOption);
             mLocationClient.startLocation();
         } else {
             mLocationClient.startLocation();
@@ -617,6 +677,7 @@ public class MainActivity extends BaseActivity
     }
 
     @OnPermissionDenied({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
-    void showRemind() {
+    void showRemind() {//获取定位权限失败，弹框提示
+        AbToastUtil.showToast(MyApplication.getApp(), R.string.open_authority_in_location);
     }
 }

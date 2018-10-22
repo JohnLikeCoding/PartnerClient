@@ -49,7 +49,7 @@
         android:layout_marginRight="@dimen/space_10"
         android:layout_marginTop="@dimen/space_50"
         android:background="@drawable/conner_green_bg"
-        android:text="投诉"
+        android:text="提交"
         android:textColor="@color/color_white"
         android:textSize="@dimen/font_16"/>
 

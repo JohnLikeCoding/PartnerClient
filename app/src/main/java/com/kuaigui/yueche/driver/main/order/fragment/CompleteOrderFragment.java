@@ -149,7 +149,7 @@ public class CompleteOrderFragment extends BaseFragment implements IResultView {
                 mOrderStatusTv.setTextColor(status.mTextColor);
 //                mTimeTv.setText(AbDateUtil.getStringByFormat(item.getOrderTime(), dateFormatYMDHMS2));
                 mTimeTv.setText(item.getOrderTimeStr());
-                mDistanceTv.setText(item.getDistance());//显示规则是什么
+                mDistanceTv.setText(item.getDistance()+"");//显示规则是什么
                 mStartTv.setText(item.getDeparture());
                 mEndTv.setText(item.getDestination());
 

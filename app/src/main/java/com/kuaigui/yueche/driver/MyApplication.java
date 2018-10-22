@@ -1,10 +1,13 @@
 package com.kuaigui.yueche.driver;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.multidex.MultiDex;
+import android.util.Log;
 
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.DefaultRefreshFooterCreater;
@@ -18,6 +21,8 @@ import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.log.LoggerInterceptor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -71,6 +76,23 @@ public class MyApplication extends Application {
         ClassicsFooter.REFRESH_FOOTER_ALLLOADED = "没有更多数据了";
     }
 
+    private List<Activity> activityList = new ArrayList<>();
+
+    public void filterAndFinish(List<String> filterActivitys) {
+        if (filterActivitys != null && filterActivitys.size() > 0) {
+            List<Activity> activities = new ArrayList<>();
+            activities.addAll(activityList);
+            for (int i = 0; i < activities.size(); i++) {
+                Activity activity = activityList.get(i);
+                if (!filterActivitys.contains(activity.getComponentName().getClassName())) {
+                    activity.finish();
+                }
+
+            }
+        }
+
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -80,6 +102,44 @@ public class MyApplication extends Application {
             StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
             StrictMode.setVmPolicy(builder.build());
         }
+
+        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
+            @Override
+            public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+                Log.i("MyApplication", "onActivityCreated");
+                activityList.add(activity);
+            }
+
+            @Override
+            public void onActivityStarted(Activity activity) {
+                Log.w("MyApplication", "onActivityStarted");
+            }
+
+            @Override
+            public void onActivityResumed(Activity activity) {
+                Log.e("MyApplication", "onActivityResumed");
+            }
+
+            @Override
+            public void onActivityPaused(Activity activity) {
+                Log.i("MyApplication", "onActivityPaused");
+            }
+
+            @Override
+            public void onActivityStopped(Activity activity) {
+                Log.i("MyApplication", "onActivityStopped");
+            }
+
+            @Override
+            public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+                Log.i("MyApplication", "onActivitySaveInstanceState");
+            }
+
+            @Override
+            public void onActivityDestroyed(Activity activity) {
+                activityList.remove(activity);
+            }
+        });
     }
 
     private void initOkHttpUtils() {
