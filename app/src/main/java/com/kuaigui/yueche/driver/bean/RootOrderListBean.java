@@ -65,7 +65,7 @@ public class RootOrderListBean {
          * destLatitude : 22.640829
          */
 
-        private long orderNo;
+        private String orderNo;
         private int commericalType;
         private long orderTime;
         private String orderTimeStr;
@@ -79,11 +79,11 @@ public class RootOrderListBean {
         private String destLongitude;
         private String destLatitude;
 
-        public long getOrderNo() {
+        public String getOrderNo() {
             return orderNo;
         }
 
-        public void setOrderNo(long orderNo) {
+        public void setOrderNo(String orderNo) {
             this.orderNo = orderNo;
         }
 
@@ -190,7 +190,7 @@ public class RootOrderListBean {
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
-            dest.writeLong(this.orderNo);
+            dest.writeString(this.orderNo);
             dest.writeInt(this.commericalType);
             dest.writeLong(this.orderTime);
             dest.writeString(this.orderTimeStr);
@@ -209,7 +209,7 @@ public class RootOrderListBean {
         }
 
         protected DataBean(Parcel in) {
-            this.orderNo = in.readLong();
+            this.orderNo = in.readString();
             this.commericalType = in.readInt();
             this.orderTime = in.readLong();
             this.orderTimeStr = in.readString();

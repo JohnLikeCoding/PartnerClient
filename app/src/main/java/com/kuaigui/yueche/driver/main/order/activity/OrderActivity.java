@@ -134,75 +134,9 @@ public class OrderActivity extends BaseActivity implements IResultView {
 
     }
 
-    private List<String> mFilter = new ArrayList<>();
 
     @Override
     public void initData() {
-        mFilter.add(MainActivity.class.getName());
-        mFilter.add(OrderActivity.class.getName());
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(ACTION_BROADCAST_CHECK_ORDER));
-    }
-
-    /**
-     * 监听是否需要取消定时获取已接订单的状态
-     */
-    public static final String ACTION_BROADCAST_CHECK_ORDER = "action_broadcast_check_order";
-    public static final String EXTRA_BROADCAST_ORDER_STATE = "extra_broadcast_order_state";
-    public static final String EXTRA_BROADCAST_ORDER_NO = "extra_broadcast_order_no";
-    public static final int BROADCAST_ORDER_STATE_DONE = 0;//确认接单
-    public static final int BROADCAST_ORDER_STATE_CANCEL = 1;//没有接单
-    private BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (action.equals(ACTION_BROADCAST_CHECK_ORDER)) {
-                int state = intent.getIntExtra(EXTRA_BROADCAST_ORDER_STATE, BROADCAST_ORDER_STATE_CANCEL);
-                if (state == BROADCAST_ORDER_STATE_DONE) {
-                    String orderNo = intent.getStringExtra(EXTRA_BROADCAST_ORDER_NO);
-                    startTask(orderNo);
-                }
-            }
-        }
-    };
-    private Timer mOrderTimer;
-
-    public void startTask(String orderNo) {
-        if (mOrderTimer == null) {
-            mOrderTimer = new Timer();
-            CheckOrderTask task = new CheckOrderTask(orderNo);
-            //2s刷新一次，刚进来不刷新
-            mOrderTimer.schedule(task, 1000, 2 * 1000);
-        }
-    }
-
-    public void cancelTask() {
-        if (mOrderTimer != null) {
-            mOrderTimer.cancel();
-            mOrderTimer = null;
-        }
-    }
-
-    /**
-     * 实现定时更新订单状态
-     */
-    private class CheckOrderTask extends TimerTask {
-        private String orderNo;
-
-        public CheckOrderTask(String orderNo) {
-            this.orderNo = orderNo;
-        }
-
-        @Override
-        public void run() {
-            checkOrder(orderNo);
-        }
-    }
-
-
-    private void checkOrder(String orderNo) {
-        OkRequestParams params = new OkRequestParams();
-        params.put("orderNo", orderNo);
-        mController.doPostRequest(Api.CHECK_ORDER, "check_order", params);
     }
 
     @OnClick(R.id.today_performance_ll)
@@ -239,23 +173,7 @@ public class OrderActivity extends BaseActivity implements IResultView {
 
     @Override
     public void showResultView(String url, String type, String content) {
-        if (url.equals(Api.CHECK_ORDER)) {
-            CustomProgress.disMiss();
-            CheckOrderInfo orderInfo = AbJsonUtil.fromJson(content, CheckOrderInfo.class);
-            if (orderInfo != null) {
-                if (orderInfo.getCode() == Api.CODE_SUCCESS) {
-                    if (orderInfo.getData().getState() == OrderStatus.ORDER_CUSTOMER_CANCEL.mOrderStatus) {
-                        AbToastUtil.showToast(this, "当前订单已被乘客取消!");
-                        MyApplication.getApp().filterAndFinish(mFilter);
-                        waitOrderFragment.getLastData();//刷新页面
-                        cancelTask();
-                    } else if (orderInfo.getData().getState() == OrderStatus.ORDER_CUSTOMER_EVALUATE.mOrderStatus
-                            || orderInfo.getData().getState() == OrderStatus.ORDER_COMPLETE.mOrderStatus) {
-                        cancelTask();
-                    }
-                }
-            }
-        }
+
     }
 
 
@@ -271,9 +189,7 @@ public class OrderActivity extends BaseActivity implements IResultView {
 
     @Override
     protected void onDestroy() {
-        cancelTask();
         OkHttpUtils.getInstance().cancelTag(this);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
         super.onDestroy();
     }
 }

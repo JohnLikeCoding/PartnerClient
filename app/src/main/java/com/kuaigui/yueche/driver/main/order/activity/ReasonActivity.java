@@ -98,6 +98,8 @@ public class ReasonActivity extends BaseActivity implements IResultView {
             if (cancelBean != null) {
                 if (cancelBean.getCode() == Api.CODE_SUCCESS) {
                     finish();
+                } else {
+                    AbToastUtil.showToast(this, cancelBean.getMessage());
                 }
             }
         }

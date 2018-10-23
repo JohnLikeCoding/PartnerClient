@@ -1,7 +1,6 @@
 package com.kuaigui.yueche.driver.main.order.activity;
 
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.CountDownTimer;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
@@ -10,12 +9,11 @@ import android.widget.TextView;
 
 import com.kuaigui.yueche.driver.R;
 import com.kuaigui.yueche.driver.base.view.BaseActivity;
-import com.kuaigui.yueche.driver.bean.CheckOrderInfo;
 import com.kuaigui.yueche.driver.bean.RootCommonBean;
 import com.kuaigui.yueche.driver.bean.RootOrderListBean;
 import com.kuaigui.yueche.driver.constant.Api;
 import com.kuaigui.yueche.driver.constant.TypeConstant;
-import com.kuaigui.yueche.driver.enums.OrderStatus;
+import com.kuaigui.yueche.driver.main.MainActivity;
 import com.kuaigui.yueche.driver.mvc.BaseController;
 import com.kuaigui.yueche.driver.mvc.IResultView;
 import com.kuaigui.yueche.driver.okhttp.OkRequestParams;
@@ -90,7 +88,7 @@ public class ConfirmOrderActivity extends BaseActivity implements IResultView {
                 break;
             case R.id.cancel_order_btn:
                 Intent intent = new Intent(this, ReasonActivity.class);
-                intent.putExtra("orderNo", mOrderData.getOrderNo());
+                intent.putExtra("orderNo", mOrderData.getOrderNo() + "");
                 intent.putExtra("cancelType", TypeConstant.CANCEL_TYPE_DRIVER_ERALY);
                 startActivity(intent);
                 break;
@@ -152,10 +150,10 @@ public class ConfirmOrderActivity extends BaseActivity implements IResultView {
                     intent.putExtra("orderData", mOrderData);
                     startActivity(intent);
 
-                    Intent broadIntent = new Intent(OrderActivity.ACTION_BROADCAST_CHECK_ORDER);
-                    broadIntent.putExtra(OrderActivity.EXTRA_BROADCAST_ORDER_STATE, OrderActivity.BROADCAST_ORDER_STATE_DONE);
-                    broadIntent.putExtra(OrderActivity.EXTRA_BROADCAST_ORDER_STATE, OrderActivity.BROADCAST_ORDER_STATE_DONE);
-                    broadIntent.putExtra(OrderActivity.EXTRA_BROADCAST_ORDER_NO, mOrderData.getOrderNo() + "");
+                    Intent broadIntent = new Intent(MainActivity.ACTION_BROADCAST_CHECK_ORDER);
+                    broadIntent.putExtra(MainActivity.EXTRA_BROADCAST_ORDER_STATE, MainActivity.BROADCAST_ORDER_STATE_DONE);
+                    broadIntent.putExtra(MainActivity.EXTRA_BROADCAST_ORDER_STATE, MainActivity.BROADCAST_ORDER_STATE_DONE);
+                    broadIntent.putExtra(MainActivity.EXTRA_BROADCAST_ORDER_NO, mOrderData.getOrderNo() + "");
                     LocalBroadcastManager.getInstance(this).sendBroadcast(broadIntent);
                     finish();
                 } else {

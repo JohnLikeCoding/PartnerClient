@@ -235,7 +235,7 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
                 break;
             case R.id.cancel_order_tv:
                 Intent intent = new Intent(this, ReasonActivity.class);
-                intent.putExtra("orderNo", mOrderData.getOrderNo());
+                intent.putExtra("orderNo", mOrderData.getOrderNo()+"");
                 intent.putExtra("cancelType", TypeConstant.CANCEL_TYPE_DRIVER_VIOLATE);
                 startActivity(intent);
                 break;

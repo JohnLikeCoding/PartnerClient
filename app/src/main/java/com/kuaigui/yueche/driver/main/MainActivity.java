@@ -3,8 +3,11 @@ package com.kuaigui.yueche.driver.main;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,6 +16,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -50,6 +54,7 @@ import com.amap.api.services.poisearch.PoiSearch;
 import com.kuaigui.yueche.driver.MyApplication;
 import com.kuaigui.yueche.driver.R;
 import com.kuaigui.yueche.driver.base.view.BaseActivity;
+import com.kuaigui.yueche.driver.bean.CheckOrderInfo;
 import com.kuaigui.yueche.driver.bean.ProgressOrderInfo;
 import com.kuaigui.yueche.driver.bean.RootCommonBean;
 import com.kuaigui.yueche.driver.bean.RootOrderListBean;
@@ -73,8 +78,11 @@ import com.kuaigui.yueche.driver.util.NumberUtil;
 import com.kuaigui.yueche.driver.widget.CircleImageView;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -229,13 +237,19 @@ public class MainActivity extends BaseActivity
         mOnlineBtn.setText(isOnline ? "下班" : "上班");
     }
 
+    private List<String> mFilter = new ArrayList<>();
+
     @Override
     public void initData() {
         mDriverNumTv.setText(BaseUtils.getMobile());
         mHandler = new Handler(Looper.getMainLooper());
         mController = new BaseController(this);
 
+        mFilter.add(MainActivity.class.getName());
+        mFilter.add(OrderActivity.class.getName());
         fetchCurOrder();
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(ACTION_BROADCAST_CHECK_ORDER));
+
     }
 
     @Override
@@ -285,7 +299,11 @@ public class MainActivity extends BaseActivity
                 }
                 break;
             case R.id.order_btn:
-                startActivity(OrderActivity.getCallIntent(this,curLatLng.longitude+"",curLatLng.latitude+""));
+                if (curLatLng == null) {
+                    AbToastUtil.showToast(this, "定位失败，请重试!");
+                    return;
+                }
+                startActivity(OrderActivity.getCallIntent(this, curLatLng.longitude + "", curLatLng.latitude + ""));
                 break;
         }
     }
@@ -336,15 +354,101 @@ public class MainActivity extends BaseActivity
         mController.doPostRequest(Api.OFFLINE, "online", params);
     }
 
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(ACTION_BROADCAST_CHECK_ORDER)) {
+                int state = intent.getIntExtra(EXTRA_BROADCAST_ORDER_STATE, BROADCAST_ORDER_STATE_CANCEL);
+                if (state == BROADCAST_ORDER_STATE_DONE) {
+                    String orderNo = intent.getStringExtra(EXTRA_BROADCAST_ORDER_NO);
+                    startTask(orderNo);
+                }
+            }
+        }
+    };
+    /**
+     * 监听是否需要取消定时获取已接订单的状态
+     */
+    public static final String ACTION_BROADCAST_CHECK_ORDER = "action_broadcast_check_order";
+    public static final String EXTRA_BROADCAST_ORDER_STATE = "extra_broadcast_order_state";
+    public static final String EXTRA_BROADCAST_ORDER_NO = "extra_broadcast_order_no";
+    public static final int BROADCAST_ORDER_STATE_DONE = 0;//确认接单
+    public static final int BROADCAST_ORDER_STATE_CANCEL = 1;//没有接单
+
+    private Timer mOrderTimer;
+
+    public void startTask(String orderNo) {
+        if (mOrderTimer == null) {
+            mOrderTimer = new Timer();
+            CheckOrderTask task = new CheckOrderTask(orderNo);
+            //2s刷新一次，刚进来不刷新
+            mOrderTimer.schedule(task, 1000, 2 * 1000);
+        }
+    }
+
+    public void cancelTask() {
+        if (mOrderTimer != null) {
+            mOrderTimer.cancel();
+            mOrderTimer = null;
+        }
+    }
+
+    /**
+     * 实现定时更新订单状态
+     */
+    private class CheckOrderTask extends TimerTask {
+        private String orderNo;
+
+        public CheckOrderTask(String orderNo) {
+            this.orderNo = orderNo;
+        }
+
+        @Override
+        public void run() {
+            checkOrder(orderNo);
+        }
+    }
+
+
+    private void checkOrder(String orderNo) {
+        OkRequestParams params = new OkRequestParams();
+        params.put("orderNo", orderNo);
+        mController.doPostRequest(Api.CHECK_ORDER, "check_order", params);
+    }
+
     @Override
     public void showLoadView(String url) {
-        CustomProgress.show(this);
+//        CustomProgress.show(this);
     }
 
     @Override
     public void showResultView(String url, String type, String content) {
         CustomProgress.disMiss();
         switch (url) {
+            case Api.CHECK_ORDER: {
+                CustomProgress.disMiss();
+                CheckOrderInfo orderInfo = AbJsonUtil.fromJson(content, CheckOrderInfo.class);
+                if (orderInfo != null) {
+                    if (orderInfo.getCode() == Api.CODE_SUCCESS) {
+                        if (orderInfo.getData().getState() == OrderStatus.ORDER_CREATE.mOrderStatus) {
+//                            AbToastUtil.showToast(this, "当前订单已被司机取消!");
+                            MyApplication.getApp().filterAndFinish(mFilter);
+//                            waitOrderFragment.getLastData();//刷新页面
+                            cancelTask();
+                        } if (orderInfo.getData().getState() == OrderStatus.ORDER_CUSTOMER_CANCEL.mOrderStatus) {
+                            AbToastUtil.showToast(this, "当前订单已被乘客取消!");
+                            MyApplication.getApp().filterAndFinish(mFilter);
+//                            waitOrderFragment.getLastData();//刷新页面
+                            cancelTask();
+                        } else if (orderInfo.getData().getState() == OrderStatus.ORDER_CUSTOMER_EVALUATE.mOrderStatus
+                                || orderInfo.getData().getState() == OrderStatus.ORDER_COMPLETE.mOrderStatus) {
+                            cancelTask();
+                        }
+                    }
+                }
+                break;
+            }
             case Api.PROGRESSINFO:
                 ProgressOrderInfo orderInfo = AbJsonUtil.fromJson(content, ProgressOrderInfo.class);
                 if (orderInfo != null) {
@@ -357,7 +461,7 @@ public class MainActivity extends BaseActivity
                         }
                         int state = Integer.parseInt(data.getState());
                         RootOrderListBean.DataBean mOrderData = new RootOrderListBean.DataBean();
-                        mOrderData.setOrderNo(Long.parseLong(data.getOrderNo()));
+                        mOrderData.setOrderNo(data.getOrderNo());
 //                        mOrderData.setCommericalType(Integer.parseInt(data.getVehicleType()));
 //                        mOrderData.setOrderTime(Long.parseLong(data.getOr()));
 //                        mOrderData.setOrderTimeStr(data.get());
@@ -370,6 +474,13 @@ public class MainActivity extends BaseActivity
                         mOrderData.setDepLongitude(data.getDepLongitude());
                         mOrderData.setDestLatitude(data.getDestLatitude());
                         mOrderData.setDestLongitude(data.getDestLongitude());
+
+                        //启动订单状态查询
+                        Intent broadIntent = new Intent(MainActivity.ACTION_BROADCAST_CHECK_ORDER);
+                        broadIntent.putExtra(MainActivity.EXTRA_BROADCAST_ORDER_STATE, MainActivity.BROADCAST_ORDER_STATE_DONE);
+                        broadIntent.putExtra(MainActivity.EXTRA_BROADCAST_ORDER_STATE, MainActivity.BROADCAST_ORDER_STATE_DONE);
+                        broadIntent.putExtra(MainActivity.EXTRA_BROADCAST_ORDER_NO, mOrderData.getOrderNo() + "");
+                        LocalBroadcastManager.getInstance(this).sendBroadcast(broadIntent);
 
                         if (state == OrderStatus.ORDER_DRIVER_TAKE.mOrderStatus) {//司机接单
                             Intent intent = new Intent(this, PickupCustomerActivity.class);
@@ -504,6 +615,8 @@ public class MainActivity extends BaseActivity
      */
     @Override
     protected void onDestroy() {
+        cancelTask();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
         super.onDestroy();
         mMapView.onDestroy();
         if (null != mLocationClient) {
