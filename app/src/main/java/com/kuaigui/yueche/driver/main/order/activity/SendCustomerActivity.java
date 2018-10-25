@@ -50,6 +50,8 @@ import com.kuaigui.yueche.driver.constant.Api;
 import com.kuaigui.yueche.driver.constant.Constant;
 import com.kuaigui.yueche.driver.main.order.utils.AMapUtil;
 import com.kuaigui.yueche.driver.main.order.utils.DrivingRouteOverlay;
+import com.kuaigui.yueche.driver.main.order.utils.JumpNavigatUtils;
+import com.kuaigui.yueche.driver.main.order.utils.PackageManagerUtil;
 import com.kuaigui.yueche.driver.mvc.BaseController;
 import com.kuaigui.yueche.driver.mvc.IResultView;
 import com.kuaigui.yueche.driver.okhttp.OkRequestParams;
@@ -202,14 +204,19 @@ public class SendCustomerActivity extends BaseActivity implements IResultView, L
                 confirmSendCustomer();
                 break;
             case R.id.nav_ll:
-                searchRouteResult(ROUTE_TYPE_DRIVE, RouteSearch.DRIVING_SINGLE_DEFAULT);
+                // TODO: 2018/10/25 暂时直接跳转到高德导航中
+                if (PackageManagerUtil.haveGaodeMap()) {
+                    JumpNavigatUtils.openGaodeMapToGuide(this, mStartLatLonPoint, "", mEndPoint, mOrderData.getDestination());
+                } else {
+                    JumpNavigatUtils.openBrowserToGuide(this, mStartLatLonPoint, "", mEndPoint, mOrderData.getDestination());
+                }
                 break;
         }
     }
 
     private void confirmSendCustomer() {
         OkRequestParams params = new OkRequestParams();
-        params.put("orderNo", mOrderData.getOrderNo()+"");
+        params.put("orderNo", mOrderData.getOrderNo() + "");
         params.put("longitude", mOrderData.getDestLongitude());
         params.put("latitude", mOrderData.getDestLatitude());
         mController.doPostRequest(Api.CONFIRM_SEND, "confirmSendCustomer", params);
@@ -244,8 +251,12 @@ public class SendCustomerActivity extends BaseActivity implements IResultView, L
     }
 
     @NeedsPermission(Manifest.permission.CALL_PHONE)
-    void showCallPhone() {
-        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + Constant.TEL));
+    void showCallPhone() {//拨打乘客的电话
+        if (mOrderData == null) {
+            AbToastUtil.showToast(this, "无法获取乘客的电话！");
+            return;
+        }
+        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + mOrderData.getPassengerMobile()));
         startActivity(intent);
     }
 
@@ -300,6 +311,8 @@ public class SendCustomerActivity extends BaseActivity implements IResultView, L
                 hasLocation = true;
                 //获取定位位置周边的地址
                 mStartLatLonPoint = new LatLonPoint(curLatLng.latitude, curLatLng.longitude);
+                //开始显示导航线路
+                searchRouteResult(ROUTE_TYPE_DRIVE, RouteSearch.DRIVING_SINGLE_DEFAULT);
 
                 geoAddress();
             } else {

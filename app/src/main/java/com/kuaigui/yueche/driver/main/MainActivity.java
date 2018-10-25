@@ -436,7 +436,8 @@ public class MainActivity extends BaseActivity
                             MyApplication.getApp().filterAndFinish(mFilter);
 //                            waitOrderFragment.getLastData();//刷新页面
                             cancelTask();
-                        } if (orderInfo.getData().getState() == OrderStatus.ORDER_CUSTOMER_CANCEL.mOrderStatus) {
+                        }
+                        if (orderInfo.getData().getState() == OrderStatus.ORDER_CUSTOMER_CANCEL.mOrderStatus) {
                             AbToastUtil.showToast(this, "当前订单已被乘客取消!");
                             MyApplication.getApp().filterAndFinish(mFilter);
 //                            waitOrderFragment.getLastData();//刷新页面

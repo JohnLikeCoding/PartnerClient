@@ -58,6 +58,8 @@ import com.kuaigui.yueche.driver.constant.Constant;
 import com.kuaigui.yueche.driver.constant.TypeConstant;
 import com.kuaigui.yueche.driver.main.order.utils.AMapUtil;
 import com.kuaigui.yueche.driver.main.order.utils.DrivingRouteOverlay;
+import com.kuaigui.yueche.driver.main.order.utils.JumpNavigatUtils;
+import com.kuaigui.yueche.driver.main.order.utils.PackageManagerUtil;
 import com.kuaigui.yueche.driver.mvc.BaseController;
 import com.kuaigui.yueche.driver.mvc.IResultView;
 import com.kuaigui.yueche.driver.okhttp.OkRequestParams;
@@ -231,11 +233,16 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.nav_tv:
-                searchRouteResult(ROUTE_TYPE_DRIVE, RouteSearch.DRIVING_SINGLE_DEFAULT);
+                // TODO: 2018/10/25 暂时直接跳转到高德导航中
+                if (PackageManagerUtil.haveGaodeMap()) {
+                    JumpNavigatUtils.openGaodeMapToGuide(this, mStartLatLonPoint, "", mEndPoint, mOrderData.getDestination());
+                } else {
+                    JumpNavigatUtils.openBrowserToGuide(this, mStartLatLonPoint, "", mEndPoint, mOrderData.getDestination());
+                }
                 break;
             case R.id.cancel_order_tv:
                 Intent intent = new Intent(this, ReasonActivity.class);
-                intent.putExtra("orderNo", mOrderData.getOrderNo()+"");
+                intent.putExtra("orderNo", mOrderData.getOrderNo());
                 intent.putExtra("cancelType", TypeConstant.CANCEL_TYPE_DRIVER_VIOLATE);
                 startActivity(intent);
                 break;
@@ -250,8 +257,8 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
 
     private void pickupCustomer() {
         OkRequestParams params = new OkRequestParams();
-        params.put("orderNo", mOrderData.getOrderNo()+"");
-        params.put("longitude",mOrderData.getDepLongitude());
+        params.put("orderNo", mOrderData.getOrderNo() + "");
+        params.put("longitude", mOrderData.getDepLongitude());
         params.put("latitude", mOrderData.getDepLatitude());
         mController.doPostRequest(Api.PICKUP_CUSTOMER, "pickupCustomer", params);
     }
@@ -288,8 +295,12 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
     }
 
     @NeedsPermission(Manifest.permission.CALL_PHONE)
-    void showCallPhone() {
-        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + Constant.TEL));
+    void showCallPhone() {//拨打乘客的电话
+        if (mOrderData == null) {
+            AbToastUtil.showToast(this, "无法获取乘客的电话！");
+            return;
+        }
+        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + mOrderData.getPassengerMobile()));
         startActivity(intent);
     }
 
@@ -344,7 +355,8 @@ public class PickupCustomerActivity extends BaseActivity implements IResultView,
                 hasLocation = true;
                 //获取定位位置周边的地址
                 mStartLatLonPoint = new LatLonPoint(curLatLng.latitude, curLatLng.longitude);
-
+                //定位成功即开始显示导航线路图
+                searchRouteResult(ROUTE_TYPE_DRIVE, RouteSearch.DRIVING_SINGLE_DEFAULT);
                 geoAddress();
             } else {
                 String errText = "定位失败," + aMapLocation.getErrorCode() + ": " + aMapLocation.getErrorInfo();
