@@ -56,6 +56,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
     //kotlin支持--end
     //android支持资源--start
+    compile "com.android.support:support-v4:$ANDROID_SUPPORT_VERSION"
     compile "com.android.support:appcompat-v7:$ANDROID_SUPPORT_VERSION"
     compile("com.android.support:design:$ANDROID_SUPPORT_VERSION") {
         exclude module: "support-v4"

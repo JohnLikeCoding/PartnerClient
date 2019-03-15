@@ -475,6 +475,8 @@ public class MainActivity extends BaseActivity
                         mOrderData.setDepLongitude(data.getDepLongitude());
                         mOrderData.setDestLatitude(data.getDestLatitude());
                         mOrderData.setDestLongitude(data.getDestLongitude());
+                        mOrderData.setPassengerName(data.getPassengerName());
+                        mOrderData.setPassengerMobile(data.getPassengerMobile());
 
                         //启动订单状态查询
                         Intent broadIntent = new Intent(MainActivity.ACTION_BROADCAST_CHECK_ORDER);

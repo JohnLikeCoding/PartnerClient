@@ -8,6 +8,6 @@ package com.kuaigui.yueche.driver.constant;
 
 public class Constant {
 
-    public static final String TEL = "0851-84777300";
+    public static final String TEL = "0851-84715300";
 
 }

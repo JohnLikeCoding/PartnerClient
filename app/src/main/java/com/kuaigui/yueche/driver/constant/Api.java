@@ -10,7 +10,9 @@ public class Api {
 
     public static final int CODE_SUCCESS = 200;
 
-    public static final String BASE_URL = "http://39.108.114.152/ntcbus/";
+    //    public static final String BASE_URL = "http://39.108.114.152/ntcbus/";
+//    public static final String BASE_URL = "http://app.quicgo.cn/ntcbus/";
+    public static final String BASE_URL = "https://app.quicgo.cn/ntcbus/";
 
     public static final String GET_CODE = BASE_URL + "common/smscode/send";
 

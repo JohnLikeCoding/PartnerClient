@@ -9,6 +9,7 @@ import android.widget.TextView;
 import com.kuaigui.yueche.driver.MyApplication;
 import com.kuaigui.yueche.driver.R;
 import com.kuaigui.yueche.driver.base.view.BaseActivity;
+import com.kuaigui.yueche.driver.constant.Constant;
 import com.kuaigui.yueche.driver.main.protocol.ProtocolActivity;
 import com.kuaigui.yueche.driver.util.AbAppUtil;
 
@@ -60,7 +61,7 @@ public class AboutActivity extends BaseActivity {
                 startActivity(ProtocolActivity.getCallIntent(this));
                 break;
             case R.id.contact_ll:
-                Intent dialIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:0851-84777300"));//跳转到拨号界面，同时传递电话号码
+                Intent dialIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:"+ Constant.TEL));//跳转到拨号界面，同时传递电话号码
                 startActivity(dialIntent);
                 break;
         }

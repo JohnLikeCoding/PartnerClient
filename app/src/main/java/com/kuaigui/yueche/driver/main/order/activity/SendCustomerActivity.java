@@ -116,7 +116,7 @@ public class SendCustomerActivity extends BaseActivity implements IResultView, L
 
     @Override
     public void initView() {
-        mTitleTv.setText("接乘客");
+        mTitleTv.setText("订单进行中");
     }
 
     @Override
