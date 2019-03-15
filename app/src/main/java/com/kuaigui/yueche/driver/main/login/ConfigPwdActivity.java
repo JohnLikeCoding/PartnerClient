@@ -76,12 +76,12 @@ public class ConfigPwdActivity extends BaseActivity implements IResultView {
             AbToastUtil.showToast(this, "请输入密码！");
             return;
         }
-        if (!pwd.equals(mPwdAgainEt)) {
+        if (!pwd.equals(pwdAgain)) {
             AbToastUtil.showToast(this, "两次密码输入不一致，请重新输入！");
             return;
         }
         OkRequestParams params = new OkRequestParams();
-        params.put("mobile", BaseUtils.getMobile());
+        params.put("token", BaseUtils.getToken());
         params.put("password", pwd);
         mController.doPostRequest(Api.CONFIG_PWD, "configPwd", params);
     }
