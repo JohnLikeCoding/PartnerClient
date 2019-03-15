@@ -18,6 +18,10 @@ public class Api {
 
     public static final String LOGIN = BASE_URL + "driver/login";
 
+    public static final String LOGIN_PWD = BASE_URL + "driver/login/substitute";
+
+    public static final String CONFIG_PWD = BASE_URL + "driver/password/config";
+
     public static final String ORDER = BASE_URL + "driver/list/unorder";
 
     public static final String TODAY_PERFORMANCE = BASE_URL + "driver/today/performance";

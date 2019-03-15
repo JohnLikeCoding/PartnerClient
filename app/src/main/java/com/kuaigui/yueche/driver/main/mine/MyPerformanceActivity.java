@@ -39,19 +39,19 @@ import butterknife.OnClick;
 public class MyPerformanceActivity extends BaseActivity implements IResultView {
 
     @BindView(R.id.back_iv)
-    ImageView mBackIv;
+    ImageView          mBackIv;
     @BindView(R.id.title_tv)
-    TextView mTitleTv;
+    TextView           mTitleTv;
     @BindView(R.id.performance_count_tv)
-    TextView mPerformanceCountTv;
+    TextView           mPerformanceCountTv;
     @BindView(R.id.order_count_tv)
-    TextView mOrderCountTv;
+    TextView           mOrderCountTv;
     @BindView(R.id.order_failure_count_tv)
-    TextView mOrderFailureCountTv;
+    TextView           mOrderFailureCountTv;
     @BindView(R.id.withhold_tv)
-    TextView mWithholdTv;
+    TextView           mWithholdTv;
     @BindView(R.id.order_rv)
-    RecyclerView mOrderRv;
+    RecyclerView       mOrderRv;
     @BindView(R.id.refresh_layout)
     SmartRefreshLayout mRefreshLayout;
 
@@ -59,7 +59,7 @@ public class MyPerformanceActivity extends BaseActivity implements IResultView {
 
     private int pageNumber = 1;
 
-    private List<RootMyPerformanceBean.DataBean.OrdersBean> mOrderList = new ArrayList<>();
+    private List<RootMyPerformanceBean.DataBean.OrdersBean>               mOrderList = new ArrayList<>();
     private BaseRecycleAdapter<RootMyPerformanceBean.DataBean.OrdersBean> mOrderAdapter;
 
     @Override
@@ -140,7 +140,7 @@ public class MyPerformanceActivity extends BaseActivity implements IResultView {
 
     private void getMyPerformance() {
         OkRequestParams params = new OkRequestParams();
-        params.put("mobile", BaseUtils.getMobile());
+        params.put("token", BaseUtils.getToken());
         params.put("page", pageNumber);
         params.put("pageSize", 10);
         mController.doPostRequest(Api.MY_PERFORMANCE, "waitOrder", params);

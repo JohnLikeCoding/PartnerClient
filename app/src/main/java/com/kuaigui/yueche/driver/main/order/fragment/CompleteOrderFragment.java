@@ -47,9 +47,9 @@ public class CompleteOrderFragment extends BaseFragment implements IResultView {
     @BindView(R.id.refresh_layout)
     SmartRefreshLayout mRefreshLayout;
     @BindView(R.id.order_rv)
-    RecyclerView mOrderRv;
+    RecyclerView       mOrderRv;
 
-    private View view;
+    private View    view;
     /**
      * 标志位，标志已经初始化完成
      */
@@ -63,12 +63,12 @@ public class CompleteOrderFragment extends BaseFragment implements IResultView {
 
     private BaseController mController;
 
-    private List<RootOrderListBean.DataBean> mCompleteOrderList = new ArrayList<>();
+    private List<RootOrderListBean.DataBean>               mCompleteOrderList = new ArrayList<>();
     private BaseRecycleAdapter<RootOrderListBean.DataBean> mCompleteOrderAdapter;
 
-    private int pageNumber = 1;
+    private              int    pageNumber     = 1;
     private final static String ARGS_LONGITUDE = "args_longitude";
-    private final static String ARGS_LATITUDE = "args_latitude";
+    private final static String ARGS_LATITUDE  = "args_latitude";
 
     public static CompleteOrderFragment newInstance(String longitude, String latitude) {
         Bundle args = new Bundle();
@@ -149,7 +149,7 @@ public class CompleteOrderFragment extends BaseFragment implements IResultView {
                 mOrderStatusTv.setTextColor(status.mTextColor);
 //                mTimeTv.setText(AbDateUtil.getStringByFormat(item.getOrderTime(), dateFormatYMDHMS2));
                 mTimeTv.setText(item.getOrderTimeStr());
-                mDistanceTv.setText(item.getDistance()+"");//显示规则是什么
+                mDistanceTv.setText(item.getDistance() + "");//显示规则是什么
                 mStartTv.setText(item.getDeparture());
                 mEndTv.setText(item.getDestination());
 
@@ -162,7 +162,7 @@ public class CompleteOrderFragment extends BaseFragment implements IResultView {
 
     private void getOrderList() {
         OkRequestParams params = new OkRequestParams();
-        params.put("mobile", BaseUtils.getMobile());
+        params.put("token", BaseUtils.getToken());
         params.put("longitude", "113.880714");//这里不需要经纬度
         params.put("latitude", "22.560353");
         params.put("state", TypeConstant.COMPLETE_ORDER);

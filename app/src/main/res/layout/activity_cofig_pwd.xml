@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <include layout="@layout/layout_top_bar"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/space_55"
+        android:layout_marginBottom="@dimen/space_70"
+        android:src="@drawable/logo1"/>
+
+    <View
+        style="@style/horizontal_line"
+        android:layout_marginLeft="@dimen/space_25"
+        android:layout_marginRight="@dimen/space_25"/>
+
+    <EditText
+        android:id="@+id/pwd_et"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/space_50"
+        android:layout_marginLeft="@dimen/space_25"
+        android:layout_marginRight="@dimen/space_25"
+        android:background="@null"
+        android:gravity="center_vertical"
+        android:hint="@string/pwd_hint"
+        android:inputType="textPassword"
+        android:maxLines="1"
+        android:textColor="@color/color_333333"
+        android:textColorHint="@color/color_808080"
+        android:textSize="@dimen/font_16"/>
+
+    <View
+        style="@style/horizontal_line"
+        android:layout_marginLeft="@dimen/space_25"
+        android:layout_marginRight="@dimen/space_25"/>
+
+    <View
+        style="@style/horizontal_line"
+        android:layout_marginLeft="@dimen/space_25"
+        android:layout_marginTop="@dimen/space_25"
+
+        android:layout_marginRight="@dimen/space_25"/>
+
+    <EditText
+        android:id="@+id/pwd_again_et"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/space_50"
+        android:layout_marginLeft="@dimen/space_25"
+        android:layout_marginRight="@dimen/space_25"
+        android:background="@null"
+        android:gravity="center_vertical"
+        android:hint="@string/pwd_again_hint"
+        android:inputType="textPassword"
+        android:maxLines="1"
+        android:textColor="@color/color_333333"
+        android:textColorHint="@color/color_808080"
+        android:textSize="@dimen/font_16"/>
+
+    <View
+        style="@style/horizontal_line"
+        android:layout_marginLeft="@dimen/space_25"
+        android:layout_marginRight="@dimen/space_25"/>
+
+    <Button
+        android:id="@+id/login_btn"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/space_45"
+        android:layout_marginLeft="@dimen/space_20"
+        android:layout_marginTop="@dimen/space_100"
+        android:layout_marginRight="@dimen/space_20"
+        android:background="@drawable/conner_green_bg"
+        android:gravity="center"
+        android:text="确定"
+        android:textColor="@color/color_f4f4f4"
+        android:textSize="@dimen/font_16"/>
+
+</LinearLayout>

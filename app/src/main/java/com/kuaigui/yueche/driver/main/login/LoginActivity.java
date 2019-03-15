@@ -48,20 +48,29 @@ public class LoginActivity extends BaseActivity implements IResultView {
     @BindView(R.id.back_iv)
     ImageView mBackIv;
     @BindView(R.id.title_tv)
-    TextView mTitleTv;
+    TextView  mTitleTv;
     @BindView(R.id.phone_et)
-    EditText mPhoneEt;
+    EditText  mPhoneEt;
     @BindView(R.id.code_et)
-    EditText mCodeEt;
+    EditText  mCodeEt;
     @BindView(R.id.code_get_tv)
-    TextView mCodeGetTv;
+    TextView  mCodeGetTv;
+    @BindView(R.id.vcode_ll)
+    View      mVCodeLayout;
+    @BindView(R.id.pwd_ll)
+    View      mPwdLayout;
+    @BindView(R.id.pwd_et)
+    EditText  mPwdEt;
+    @BindView(R.id.change_login_tv)
+    TextView  mChangeLoginTv;
 
     private BaseController mController;
 
-    private MyTimer myTimer;
-    private final long TIME = 60 * 1000L;
-    private final long INTERVAL = 1000L;
-    private String mobile;
+    private       MyTimer myTimer;
+    private final long    TIME       = 60 * 1000L;
+    private final long    INTERVAL   = 1000L;
+    private       String  mobile;
+    private       boolean isPwdLogin = false;
 
     @Override
     public int setLayout() {
@@ -81,7 +90,7 @@ public class LoginActivity extends BaseActivity implements IResultView {
         mController = new BaseController(this);
     }
 
-    @OnClick({R.id.back_iv, R.id.code_get_tv, R.id.login_btn})
+    @OnClick({R.id.back_iv, R.id.code_get_tv, R.id.login_btn, R.id.change_login_tv})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.back_iv:
@@ -90,6 +99,12 @@ public class LoginActivity extends BaseActivity implements IResultView {
             case R.id.code_get_tv:
                 mCodeGetTv.setEnabled(false);
                 getCode();
+                break;
+            case R.id.change_login_tv:
+                isPwdLogin = !isPwdLogin;
+                mChangeLoginTv.setText(isPwdLogin ? getString(R.string.login_vcode_hint) : getString(R.string.login_pwd_hint));
+                mVCodeLayout.setVisibility(isPwdLogin ? View.GONE : View.VISIBLE);
+                mPwdLayout.setVisibility(isPwdLogin ? View.VISIBLE : View.GONE);
                 break;
             case R.id.login_btn:
                 login();
@@ -114,14 +129,26 @@ public class LoginActivity extends BaseActivity implements IResultView {
             AbToastUtil.showToast(this, "请输入正确的手机号码！");
             return;
         }
-        if (TextUtils.isEmpty(mCodeEt.getText().toString())) {
-            AbToastUtil.showToast(this, "请输入正确的验证码！");
-            return;
+        if (isPwdLogin) {
+            if (TextUtils.isEmpty(mPwdEt.getText().toString().trim())) {
+                AbToastUtil.showToast(this, "请输入正确的密码！");
+                return;
+            }
+
+        } else {
+            if (TextUtils.isEmpty(mCodeEt.getText().toString())) {
+                AbToastUtil.showToast(this, "请输入正确的验证码！");
+                return;
+            }
         }
         OkRequestParams params = new OkRequestParams();
         params.put("mobile", mobile);
-        params.put("vCode", mCodeEt.getText().toString());
-        mController.doPostRequest(Api.LOGIN, "login", params);
+        if (isPwdLogin) {
+            params.put("password", mPwdEt.getText().toString().trim());
+        } else {
+            params.put("vCode", mCodeEt.getText().toString());
+        }
+        mController.doPostRequest(isPwdLogin ? Api.LOGIN_PWD : Api.LOGIN, "login", params);
     }
 
     @Override
@@ -151,10 +178,26 @@ public class LoginActivity extends BaseActivity implements IResultView {
                 if (loginBean != null) {
                     if (loginBean.getCode() == Api.CODE_SUCCESS) {
                         BaseUtils.saveLoginInfo(loginBean.getData());
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        if (loginBean.getData().getPwdset() == 1) {
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        } else {
+                            startActivity(new Intent(LoginActivity.this, ConfigPwdActivity.class));
+                        }
                         finish();
                     } else {
                         AbToastUtil.showToast(this, loginBean.getMessage());
+                    }
+                }
+                break;
+            case Api.LOGIN_PWD:
+                RootLoginBean loginPwdBean = AbJsonUtil.fromJson(content, RootLoginBean.class);
+                if (loginPwdBean != null) {
+                    if (loginPwdBean.getCode() == Api.CODE_SUCCESS) {
+                        BaseUtils.saveLoginInfo(loginPwdBean.getData());
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        finish();
+                    } else {
+                        AbToastUtil.showToast(this, loginPwdBean.getMessage());
                     }
                 }
                 break;

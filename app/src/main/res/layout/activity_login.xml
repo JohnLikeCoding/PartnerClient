@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical">
@@ -10,8 +11,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="@dimen/space_70"
         android:layout_marginTop="@dimen/space_55"
+        android:layout_marginBottom="@dimen/space_70"
         android:src="@drawable/logo1"/>
 
     <View
@@ -42,8 +43,8 @@
             android:background="@null"
             android:gravity="center_vertical"
             android:hint="@string/phone_hint"
-            android:maxLength="11"
             android:inputType="number"
+            android:maxLength="11"
             android:maxLines="1"
             android:textColor="@color/color_333333"
             android:textColorHint="@color/color_808080"
@@ -57,6 +58,7 @@
         android:layout_marginRight="@dimen/space_25"/>
 
     <LinearLayout
+        android:id="@+id/vcode_ll"
         android:layout_width="match_parent"
         android:layout_height="@dimen/space_50"
         android:layout_marginLeft="@dimen/space_25"
@@ -98,6 +100,41 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/pwd_ll"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/space_50"
+        android:layout_marginLeft="@dimen/space_25"
+        android:layout_marginRight="@dimen/space_25"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pwd"
+            android:textColor="@color/color_333333"
+            android:textSize="@dimen/font_16"/>
+
+        <EditText
+            android:id="@+id/pwd_et"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/space_15"
+            android:layout_weight="1"
+            android:background="@null"
+            android:gravity="center_vertical"
+            android:hint="@string/pwd_hint"
+            android:inputType="textPassword"
+            android:maxLines="1"
+            android:textColor="@color/color_333333"
+            android:textColorHint="@color/color_808080"
+            android:textSize="@dimen/font_16"/>
+
+    </LinearLayout>
+
     <View
         style="@style/horizontal_line"
         android:layout_marginLeft="@dimen/space_25"
@@ -108,12 +145,24 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/space_45"
         android:layout_marginLeft="@dimen/space_20"
-        android:layout_marginRight="@dimen/space_20"
         android:layout_marginTop="@dimen/space_100"
+        android:layout_marginRight="@dimen/space_20"
         android:background="@drawable/conner_green_bg"
         android:gravity="center"
         android:text="登录"
         android:textColor="@color/color_f4f4f4"
         android:textSize="@dimen/font_16"/>
+
+    <TextView
+        android:id="@+id/change_login_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/space_20"
+        android:layout_marginRight="@dimen/space_20"
+        android:gravity="right"
+        android:paddingTop="@dimen/space_10"
+        android:paddingBottom="@dimen/space_10"
+        android:text="@string/login_pwd_hint"
+        android:textColor="@color/color_15ADFE"/>
 
 </LinearLayout>

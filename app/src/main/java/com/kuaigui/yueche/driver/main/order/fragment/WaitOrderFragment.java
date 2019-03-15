@@ -52,9 +52,9 @@ public class WaitOrderFragment extends BaseFragment implements IResultView {
     @BindView(R.id.refresh_layout)
     SmartRefreshLayout mRefreshLayout;
     @BindView(R.id.order_rv)
-    RecyclerView mOrderRv;
+    RecyclerView       mOrderRv;
 
-    private View view;
+    private View    view;
     /**
      * 标志位，标志已经初始化完成
      */
@@ -68,12 +68,12 @@ public class WaitOrderFragment extends BaseFragment implements IResultView {
 
     private BaseController mController;
 
-    private List<RootOrderListBean.DataBean> mWaitOrderList = new ArrayList<>();
+    private List<RootOrderListBean.DataBean>               mWaitOrderList = new ArrayList<>();
     private BaseRecycleAdapter<RootOrderListBean.DataBean> mWaitOrderAdapter;
 
-    private int pageNumber = 1;
+    private              int    pageNumber     = 1;
     private final static String ARGS_LONGITUDE = "args_longitude";
-    private final static String ARGS_LATITUDE = "args_latitude";
+    private final static String ARGS_LATITUDE  = "args_latitude";
 
     public static WaitOrderFragment newInstance(String longitude, String latitude) {
         Bundle args = new Bundle();
@@ -84,8 +84,8 @@ public class WaitOrderFragment extends BaseFragment implements IResultView {
         return fragment;
     }
 
-    private String curLongitude;
-    private String curLatitude;
+    private String  curLongitude;
+    private String  curLatitude;
     private Handler mHandler;
 
     @Nullable
@@ -191,7 +191,7 @@ public class WaitOrderFragment extends BaseFragment implements IResultView {
 
     private void getOrderList() {
         OkRequestParams params = new OkRequestParams();
-        params.put("mobile", BaseUtils.getMobile());
+        params.put("token", BaseUtils.getToken());
         params.put("longitude", curLongitude);
         params.put("latitude", curLatitude);
         params.put("state", TypeConstant.WAIT_ORDER);

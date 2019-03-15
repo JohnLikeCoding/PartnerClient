@@ -91,7 +91,7 @@ public class TodayPerformanceDialogFragment extends DialogFragment implements IR
 
     private void getPerformance() {
         OkRequestParams params = new OkRequestParams();
-        params.put("mobile", BaseUtils.getMobile());
+        params.put("token", BaseUtils.getToken());
         mController.doPostRequest(Api.TODAY_PERFORMANCE, "todayPerformance", params);
     }
 

@@ -16,6 +16,7 @@ public class BaseUtils {
         AbSharedUtil.putInt(MyApplication.getApp(), "level", loginBean.getLevel());
         AbSharedUtil.putString(MyApplication.getApp(), "monthValue", String.valueOf(loginBean.getMonthValue()));
         AbSharedUtil.putString(MyApplication.getApp(), "totalValue", String.valueOf(loginBean.getTotalValue()));
+        AbSharedUtil.putString(MyApplication.getApp(), "token", loginBean.getToken());
 
         AbSharedUtil.putBoolean(MyApplication.getApp(), "isLogin", true);
     }
@@ -35,6 +36,7 @@ public class BaseUtils {
         AbSharedUtil.remove(MyApplication.getApp(), "level");
         AbSharedUtil.remove(MyApplication.getApp(), "monthValue");
         AbSharedUtil.remove(MyApplication.getApp(), "totalValue");
+        AbSharedUtil.remove(MyApplication.getApp(), "token");
 
         AbSharedUtil.remove(MyApplication.getApp(), "isLogin");
         AbSharedUtil.remove(MyApplication.getApp(), "isOnline");
@@ -75,6 +77,11 @@ public class BaseUtils {
 
     public static boolean isOnline() {
         return AbSharedUtil.getBoolean(MyApplication.getApp(), "isOnline", false);
+    }
+
+    public static String getToken() {
+        return TextUtils.isEmpty(AbSharedUtil.getString(MyApplication.getApp(), "token"))
+                ? "" : AbSharedUtil.getString(MyApplication.getApp(), "token");
     }
 
 }

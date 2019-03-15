@@ -99,34 +99,34 @@ public class MainActivity extends BaseActivity
         LocationSource, AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener, PoiSearch.OnPoiSearchListener {
 
     @BindView(R.id.title_tv)
-    TextView mTitleTv;
+    TextView       mTitleTv;
     @BindView(R.id.toolbar)
-    Toolbar mToolbar;
+    Toolbar        mToolbar;
     @BindView(R.id.nav_view)
     NavigationView mNavView;
     @BindView(R.id.drawer_layout)
-    DrawerLayout mDrawerLayout;
+    DrawerLayout   mDrawerLayout;
     @BindView(R.id.online_tip_ll)
-    LinearLayout mOnlineTipLl;
+    LinearLayout   mOnlineTipLl;
     @BindView(R.id.local_tv)
-    TextView mLocalTv;
+    TextView       mLocalTv;
     @BindView(R.id.current_time_tv)
-    TextView mCurrentTimeTv;
+    TextView       mCurrentTimeTv;
 
     @BindView(R.id.month_performance_tv)
     TextView mMonthPerformanceTv;
     @BindView(R.id.total_performance_tv)
     TextView mTotalPerformanceTv;
     @BindView(R.id.online_btn)
-    Button mOnlineBtn;
+    Button   mOnlineBtn;
     @BindView(R.id.order_btn)
-    Button mOrderBtn;
+    Button   mOrderBtn;
 
     CircleImageView mHeadIv;
-    TextView mDriverNumTv;
-    MapView mMapView;
-    private AMap aMap;
-    private AMapLocationClient mLocationClient;
+    TextView        mDriverNumTv;
+    MapView         mMapView;
+    private AMap                      aMap;
+    private AMapLocationClient        mLocationClient;
     private OnLocationChangedListener mListener;
 
     private BaseController mController;
@@ -322,7 +322,7 @@ public class MainActivity extends BaseActivity
      */
     private void uploadPosition(String longitude, String latitude) {
         OkRequestParams params = new OkRequestParams();
-        params.put("mobile", BaseUtils.getMobile());
+        params.put("token", BaseUtils.getToken());
         params.put("longitude", longitude);
         params.put("latitude", latitude);
         mController.doPostRequest(Api.LOCATE, "locate", params);
@@ -335,7 +335,7 @@ public class MainActivity extends BaseActivity
             return;
         }
         OkRequestParams params = new OkRequestParams();
-        params.put("mobile", BaseUtils.getMobile());
+        params.put("token", BaseUtils.getToken());
         params.put("longitude", curLatLng.longitude + "");
         params.put("latitude", curLatLng.latitude + "");
         mController.doPostRequest(Api.ONLINE, "online", params);
@@ -348,13 +348,13 @@ public class MainActivity extends BaseActivity
             return;
         }
         OkRequestParams params = new OkRequestParams();
-        params.put("mobile", BaseUtils.getMobile());
+        params.put("token", BaseUtils.getToken());
         params.put("longitude", curLatLng.longitude + "");
         params.put("latitude", curLatLng.latitude + "");
         mController.doPostRequest(Api.OFFLINE, "online", params);
     }
 
-    private BroadcastReceiver receiver = new BroadcastReceiver() {
+    private             BroadcastReceiver receiver                     = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -370,11 +370,11 @@ public class MainActivity extends BaseActivity
     /**
      * 监听是否需要取消定时获取已接订单的状态
      */
-    public static final String ACTION_BROADCAST_CHECK_ORDER = "action_broadcast_check_order";
-    public static final String EXTRA_BROADCAST_ORDER_STATE = "extra_broadcast_order_state";
-    public static final String EXTRA_BROADCAST_ORDER_NO = "extra_broadcast_order_no";
-    public static final int BROADCAST_ORDER_STATE_DONE = 0;//确认接单
-    public static final int BROADCAST_ORDER_STATE_CANCEL = 1;//没有接单
+    public static final String            ACTION_BROADCAST_CHECK_ORDER = "action_broadcast_check_order";
+    public static final String            EXTRA_BROADCAST_ORDER_STATE  = "extra_broadcast_order_state";
+    public static final String            EXTRA_BROADCAST_ORDER_NO     = "extra_broadcast_order_no";
+    public static final int               BROADCAST_ORDER_STATE_DONE   = 0;//确认接单
+    public static final int               BROADCAST_ORDER_STATE_CANCEL = 1;//没有接单
 
     private Timer mOrderTimer;
 
@@ -628,8 +628,8 @@ public class MainActivity extends BaseActivity
     }
 
     private boolean hasLocation;
-    private String curAddress = "定位失败";
-    private LatLng curLatLng;
+    private String  curAddress = "定位失败";
+    private LatLng  curLatLng;
     private Handler mHandler;
 
     private void refreshLocationTv() {
@@ -711,7 +711,7 @@ public class MainActivity extends BaseActivity
         mLocationClient = null;
     }
 
-    private LatLonPoint mSearchLatLonPoint;
+    private LatLonPoint   mSearchLatLonPoint;
     private GeocodeSearch geocoderSearch;
 
     /**

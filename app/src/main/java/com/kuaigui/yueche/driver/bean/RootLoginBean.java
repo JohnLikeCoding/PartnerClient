@@ -7,14 +7,15 @@ package com.kuaigui.yueche.driver.bean;
 
 public class RootLoginBean {
 
+
     /**
      * code : 200
      * message : operate successfully
-     * data : {"id":1,"mobile":"15632323232","code":"5461321","name":"张三","licenseId":"9669669","level":5,"monthValue":386.77,"totalValue":386.77,"longitude":"106.6428967","latitude":"26.6386200"}
+     * data : {"id":92,"mobile":"18885100646","password":"21218cca77804d2ba1922c33e0151105","code":"155592","name":"谷贤","licenseId":"520112198812012824","level":5,"monthValue":674.73,"totalValue":801.71,"longitude":"113.887673","latitude":"22.552199","carId":87,"vehicleNo":"贵A5E08F","token":"88ed35af3c5d4e9f9452d9f90ef6cd6b","pwdset":1,"illegalLoginCount":0}
      */
 
-    private int code;
-    private String message;
+    private int      code;
+    private String   message;
     private DataBean data;
 
     public int getCode() {
@@ -26,7 +27,7 @@ public class RootLoginBean {
     }
 
     public String getMessage() {
-        return message== null ? "" :message;
+        return message == null ? "" : message;
     }
 
     public void setMessage(String message) {
@@ -43,28 +44,40 @@ public class RootLoginBean {
 
     public static class DataBean {
         /**
-         * id : 1
-         * mobile : 15632323232
-         * code : 5461321
-         * name : 张三
-         * licenseId : 9669669
+         * id : 92
+         * mobile : 18885100646
+         * password : 21218cca77804d2ba1922c33e0151105
+         * code : 155592
+         * name : 谷贤
+         * licenseId : 520112198812012824
          * level : 5
-         * monthValue : 386.77
-         * totalValue : 386.77
-         * longitude : 106.6428967
-         * latitude : 26.6386200
+         * monthValue : 674.73
+         * totalValue : 801.71
+         * longitude : 113.887673
+         * latitude : 22.552199
+         * carId : 87
+         * vehicleNo : 贵A5E08F
+         * token : 88ed35af3c5d4e9f9452d9f90ef6cd6b
+         * pwdset : 1
+         * illegalLoginCount : 0
          */
 
-        private int id;
+        private int    id;
         private String mobile;
+        private String password;
         private String code;
         private String name;
         private String licenseId;
-        private int level;
+        private int    level;
         private double monthValue;
         private double totalValue;
         private String longitude;
         private String latitude;
+        private int    carId;
+        private String vehicleNo;
+        private String token;
+        private int    pwdset;
+        private int    illegalLoginCount;
 
         public int getId() {
             return id;
@@ -75,15 +88,23 @@ public class RootLoginBean {
         }
 
         public String getMobile() {
-            return mobile== null ? "" :mobile;
+            return mobile == null ? "" : mobile;
         }
 
         public void setMobile(String mobile) {
             this.mobile = mobile;
         }
 
+        public String getPassword() {
+            return password == null ? "" : password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
         public String getCode() {
-            return code== null ? "" :code;
+            return code == null ? "" : code;
         }
 
         public void setCode(String code) {
@@ -91,7 +112,7 @@ public class RootLoginBean {
         }
 
         public String getName() {
-            return name== null ? "" :name;
+            return name == null ? "" : name;
         }
 
         public void setName(String name) {
@@ -99,7 +120,7 @@ public class RootLoginBean {
         }
 
         public String getLicenseId() {
-            return licenseId== null ? "" :licenseId;
+            return licenseId == null ? "" : licenseId;
         }
 
         public void setLicenseId(String licenseId) {
@@ -131,7 +152,7 @@ public class RootLoginBean {
         }
 
         public String getLongitude() {
-            return longitude== null ? "" :longitude;
+            return longitude == null ? "" : longitude;
         }
 
         public void setLongitude(String longitude) {
@@ -139,11 +160,51 @@ public class RootLoginBean {
         }
 
         public String getLatitude() {
-            return latitude== null ? "" :latitude;
+            return latitude == null ? "" : latitude;
         }
 
         public void setLatitude(String latitude) {
             this.latitude = latitude;
+        }
+
+        public int getCarId() {
+            return carId;
+        }
+
+        public void setCarId(int carId) {
+            this.carId = carId;
+        }
+
+        public String getVehicleNo() {
+            return vehicleNo == null ? "" : vehicleNo;
+        }
+
+        public void setVehicleNo(String vehicleNo) {
+            this.vehicleNo = vehicleNo;
+        }
+
+        public String getToken() {
+            return token == null ? "" : token;
+        }
+
+        public void setToken(String token) {
+            this.token = token;
+        }
+
+        public int getPwdset() {
+            return pwdset;
+        }
+
+        public void setPwdset(int pwdset) {
+            this.pwdset = pwdset;
+        }
+
+        public int getIllegalLoginCount() {
+            return illegalLoginCount;
+        }
+
+        public void setIllegalLoginCount(int illegalLoginCount) {
+            this.illegalLoginCount = illegalLoginCount;
         }
     }
 }
